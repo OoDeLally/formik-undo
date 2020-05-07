@@ -36,9 +36,16 @@ interface FormikUndoContextProviderProps {
 export const FormikUndoContextProvider = <Values extends object>({
   children
 }: FormikUndoContextProviderProps) => {
+  const formikContext = useFormikContext<Values>();
+  if (!formikContext) {
+    throw new Error(
+      'Formik context not found. ' +
+      'Make sure you use <FormikUndoContextProvider/> inside a Formik context.'
+    );
+  }
   const {
     values: formikValues, setValues: setFormikValues, initialValues: formikInitialValues
-  } = useFormikContext<Values>();
+  } = formikContext;
   const formikValuesRef = useValueRef(formikValues);
   const checkPoints = useRef<Values[]>([formikInitialValues]).current;
   const [currentCheckpointIndex, currentCheckpointIndexRef, setCurrentCheckpointIndex] = useStateAndRef(0);
@@ -54,7 +61,7 @@ export const FormikUndoContextProvider = <Values extends object>({
       }
       checkPoints.splice(
         currentCheckpointIndexRef.current + 1,
-        checkPoints.length, // Remove all history after current position.
+        checkPoints.length, // Remove all checkpoints after current position.
         formikValuesRef.current,
       );
       setCurrentCheckpointIndex(index => index + 1);

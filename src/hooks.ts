@@ -48,7 +48,7 @@ export const useEffectAfterFirstChange =
         return effectRef.current();
       }
     },
-    [...otherDeps, effectRef, depToMonitor, initialDepValueRef], // eslint-disable-line react-hooks/exhaustive-deps
+    [...(otherDeps || []), effectRef, depToMonitor, initialDepValueRef],
   );
 };
 

@@ -1,19 +1,32 @@
 module.exports = {
-  root: false,
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    sourceType: 'module',
+  root: true,
+  env: {
+    browser: true,
+    node: true,
   },
-  extends: [
-    'eslint:recommended',
-    'plugin:react/recommended'
-  ],
+  parserOptions: {
+    ecmaVersion: 2017,
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true
+    }
+  },
   plugins: [
     '@typescript-eslint',
+    "react",
     'react-hooks',
+  ],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+    'react-app',
+    'plugin:react/recommended'
   ],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-empty-interface': 'off',
+    '@typescript-eslint/camelcase': 'warn',
     '@typescript-eslint/member-delimiter-style': 'warn',
     '@typescript-eslint/no-inferrable-types': 'warn',
     '@typescript-eslint/no-non-null-assertion': 'off',
@@ -26,6 +39,7 @@ module.exports = {
     'array-bracket-spacing': ['warn', 'never'],
     'arrow-parens': 'off',
     'comma-spacing': ['warn', {"before": false, "after": true}],
+    "indent": ['warn', 2, { SwitchCase: 1 }],
     'interface-name': 'off',
     'interface-over-type-literal': 'off',
     'jsx-no-multiline-js': 'off',
@@ -56,28 +70,7 @@ module.exports = {
     'trailing-comma': 'off',
     'variable-name': 'off',
   },
-  ignorePatterns: ['**/node_modules/'],
-  settings: {
-    "react": {
-      "createClass": "createReactClass", // Regex for Component Factory to use,
-      // default to "createReactClass"
-      "pragma": "React",  // Pragma to use, default to "React"
-      "version": "detect", // React version. "detect" automatically picks the version you have installed.
-      // You can also use `16.0`, `16.3`, etc, if you want to override the detected value.
-      // default to latest and warns if missing
-      // It will default to "detect" in the future
-      "flowVersion": "0.53" // Flow version
-    },
-    "propWrapperFunctions": [
-      // The names of any function used to wrap propTypes, e.g. `forbidExtraProps`. If this isn't set, any propTypes wrapped in a function will be skipped.
-      "forbidExtraProps",
-      { "property": "freeze", "object": "Object" },
-      { "property": "myFavoriteWrapper" }
-    ],
-    "linkComponents": [
-      // Components used as alternatives to <a> for linking, eg. <Link to={ url } />
-      "Hyperlink",
-      { "name": "Link", "linkAttribute": "to" }
-    ]
-  }
+  ignorePatterns: [
+    '**/node_modules/*'
+  ]
 };
