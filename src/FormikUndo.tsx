@@ -39,8 +39,9 @@ export const FormikUndoContextProvider = <Values extends object>({
   const formikContext = useFormikContext<Values>();
   if (!formikContext) {
     throw new Error(
-      'Formik context not found. ' +
-      'Make sure you use <FormikUndoContextProvider/> inside a Formik context.'
+      'Formik context not found. Make sure that: \n' +
+      '  1- you use <FormikUndoContextProvider> inside a <Formik> context.\n' +
+      '  2- Your app and FormikUndoContextProvider are using the same Formik module instance.'
     );
   }
   const {

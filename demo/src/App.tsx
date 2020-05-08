@@ -1,8 +1,9 @@
 import { createStyles, CssBaseline, makeStyles, Paper, TextField, Theme } from '@material-ui/core';
-import { Field, Form, Formik, useFormikContext } from 'formik';
+import { Field, Form, Formik, useFormikContext } from 'formik'; // Using formik-undo's  formik module one folder up.
 import { FormikUndoContextProvider, FormikUndoControl } from 'formik-undo';
 import React from 'react';
 import { MaterialFormikUndoControl } from './MaterialUiFormikUndoControl';
+
 
 
 interface Article {
@@ -29,16 +30,14 @@ export const useStyles = makeStyles((theme: Theme) =>
 
 
 const MyForm = () => {
-  const { values } = useFormikContext<Article>();
-  console.log('values', values);
+  // const { values } = useFormikContext<Article>();
+  // console.log('values', values);
   return (
     <Form>
-      <FormikUndoContextProvider>
-        {/* <MaterialFormikUndoControl /> */}
-        {/* <FormikUndoControl /> */}
+        <MaterialFormikUndoControl />
+        <FormikUndoControl />
         <Field as={TextField} name="title" />
         <Field as={TextField} name="content" />
-      </FormikUndoContextProvider>
     </Form>
   )
 };
@@ -59,7 +58,9 @@ const App = () => {
           initialValues={initialValues}
           onSubmit={handleSubmit}
         >
-          <MyForm />
+          <FormikUndoContextProvider>
+            <MyForm />
+          </FormikUndoContextProvider>
         </Formik>
       </Paper>
     </>
