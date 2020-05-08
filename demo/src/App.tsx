@@ -32,17 +32,25 @@ export const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(2),
       padding: theme.spacing(2),
       flex: 0,
+      flexDirection: 'column',
+    },
+    manualSaveButton: {
+      display: 'block',
     },
     autoSaveControl: {
       display: 'flex',
-      flexDirection: 'row',
+      flexDirection: 'column',
+      marginTop: theme.spacing(4),
       marginBottom: theme.spacing(4),
     },
     autoSaveControlField: {
+      marginTop: theme.spacing(2),
+      display: 'block',
       width: '5em',
     },
     undoableCounter: {
-      width: '5em',
+      marginTop: theme.spacing(2),
+      width: '9em',
     },
     undoControlBar: {
       display: 'flex',
@@ -55,21 +63,30 @@ export const useStyles = makeStyles((theme: Theme) =>
     },
     vanillaControlBar: {
       margin: theme.spacing(1),
-    }
+    },
+    titleField: {
+      display: 'block',
+    },
+    contentField: {
+      display: 'block',
+      marginTop: theme.spacing(4),
+    },
   }),
 );
 
 
 const SaveCheckpointButton = () => {
+  const classes = useStyles();
   const { saveCheckpoint } = useFormikUndo();
   return (
     <Button
+      className={classes.manualSaveButton}
       variant="contained"
       size="small"
       onClick={saveCheckpoint}
       title="Create a checkpoint now in the undo history"
     >
-      Manual Save
+      Save now
     </Button>
   );
 };
@@ -91,6 +108,22 @@ const UndoableCounter = () => {
 };
 
 
+const RedoableCounter = () => {
+  const classes = useStyles();
+  const { redoableCount } = useFormikUndo();
+  return (
+    <TextField
+      className={classes.undoableCounter}
+      type="number"
+      disabled={true}
+      label="Redoable Count"
+      size="small"
+      value={redoableCount}
+    />
+  );
+};
+
+
 const AutoSaveControl = () => {
   const classes = useStyles();
   const [enabled, setEnabled] = useState(true);
@@ -107,12 +140,24 @@ const AutoSaveControl = () => {
       />
       <TextField
         className={classes.autoSaveControlField}
+        disabled={!enabled}
         type="number"
         label="Throttle"
         size="small"
         value={throttleDelay}
         onChange={
           (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setThrottleDelay(+e.target.value)
+        }
+      />
+      <TextField
+        className={classes.autoSaveControlField}
+        disabled={!enabled}
+        type="number"
+        label="Debounce"
+        size="small"
+        value={debounceDelay}
+        onChange={
+          (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setDebounceDelay(+e.target.value)
         }
       />
     </div>
@@ -124,9 +169,10 @@ const Sidebar = () => {
   const classes = useStyles();
   return (
     <>
-      <AutoSaveControl />
       <SaveCheckpointButton />
       <UndoableCounter/>
+      <RedoableCounter/>
+      <AutoSaveControl />
     </>
   )
 };
@@ -143,8 +189,20 @@ const MyForm = () => {
         <FormikUndoControl className={classes.vanillaControlBar} />
         <div>)</div>
       </div>
-      <Field as={TextField} name="title" />
-      <Field as={TextField} name="content" />
+      <Field
+        as={TextField}
+        className={classes.titleField}
+        label="Title"
+        name="title"
+      />
+      <Field
+        as={TextField}
+        className={classes.contentField}
+        name="content"
+        label="Content"
+        variant="outlined" multiline
+        rows={10}
+      />
     </Form>
   )
 };
