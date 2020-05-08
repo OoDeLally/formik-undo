@@ -53,7 +53,7 @@ export const useEffectAfterFirstChange =
 };
 
 
-export const useThrottledValue = <T extends unknown>(latestValue: T, delay: number) => {
+export const useThrottledValue = <T extends unknown>(latestValue: T, delay: number, resetTimer?: boolean) => {
   const [value, setValue] = useState<T>(latestValue);
   const isIdleRef = useRef(true);
   const latestKnownValueRef = useValueRef<T>(latestValue);
@@ -95,7 +95,7 @@ export const useThrottledValue = <T extends unknown>(latestValue: T, delay: numb
 };
 
 
-export const useDebouncedValue = <T extends unknown>(latestValue: T, delay: number): T => {
+export const useDebouncedValue = <T extends unknown>(latestValue: T, delay: number, resetTimer?: boolean): T => {
   const [value, setValue] = useState<T>(latestValue);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const scheduleNewValue = useCallback(

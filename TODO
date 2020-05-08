@@ -1,1 +1,3 @@
 - AutoSave should save everytime we start modifying a different field.
+
+- How to disable debounce / throttle
