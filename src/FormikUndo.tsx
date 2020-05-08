@@ -50,15 +50,19 @@ export const FormikUndoContextProvider = <Values extends object>({
   const formikValuesRef = useValueRef(formikValues);
   const checkPoints = useRef<Values[]>([formikInitialValues]).current;
   const [currentCheckpointIndex, currentCheckpointIndexRef, setCurrentCheckpointIndex] = useStateAndRef(0);
-  const lastModifiedValuesRef = useRef<Values | undefined>();
+  const lastValuesModifiedByUsRef = useRef<Values | undefined>();
 
   const undoableCount = currentCheckpointIndex;
   const redoableCount = checkPoints.length - currentCheckpointIndex - 1;
 
   const saveCheckpoint = useCallback(
     () => {
-      if (formikValuesRef.current === lastModifiedValuesRef.current) {
+      if (formikValuesRef.current === lastValuesModifiedByUsRef.current) {
         return; // This change was created by us. Saving aborted.
+      }
+      const currentCheckpoint = checkPoints[currentCheckpointIndexRef.current];
+      if (formikValuesRef.current === currentCheckpoint) {
+        return; // The state of the form has not changed. Nothing to do.
       }
       checkPoints.splice(
         currentCheckpointIndexRef.current + 1,
@@ -72,7 +76,7 @@ export const FormikUndoContextProvider = <Values extends object>({
 
   const setNewFormikValue = useCallback(
     (newValues: Values) => {
-      lastModifiedValuesRef.current = newValues;
+      lastValuesModifiedByUsRef.current = newValues;
       setFormikValues(newValues);
     },
     [setFormikValues],

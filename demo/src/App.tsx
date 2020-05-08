@@ -166,7 +166,6 @@ const AutoSaveControl = () => {
 
 
 const Sidebar = () => {
-  const classes = useStyles();
   return (
     <>
       <SaveCheckpointButton />

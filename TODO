@@ -1,3 +1,1 @@
-- `Save Now` should not save multiple time if the value didnt change
-
 - AutoSave should save everytime we start modifying a different field.
