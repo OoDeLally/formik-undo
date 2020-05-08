@@ -1,6 +1,6 @@
 import { createStyles, CssBaseline, makeStyles, Paper, TextField, Theme } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik'; // Using formik-undo's  formik module one folder up.
-import { FormikUndoContextProvider, FormikUndoControl } from 'formik-undo';
+import { FormikUndoContextProvider, FormikUndoControl, useFormikUndoAutoSave } from 'formik-undo';
 import React from 'react';
 import { MaterialFormikUndoControl } from './MaterialUiFormikUndoControl';
 
@@ -39,14 +39,15 @@ export const useStyles = makeStyles((theme: Theme) =>
 
 const MyForm = () => {
   const classes = useStyles();
+  useFormikUndoAutoSave(1000, 1000);
   return (
     <Form>
       <div className={classes.undoControlBar}>
-        <div className={classes.undoControlBarTitle}>with Material UI</div>
+        <div className={classes.undoControlBarTitle}>Material UI</div>
         <MaterialFormikUndoControl />
       </div>
       <div className={classes.undoControlBar}>
-        <div className={classes.undoControlBarTitle}>Vanilla</div>
+        <div className={classes.undoControlBarTitle}>Vanilla elements</div>
         <FormikUndoControl />
       </div>
       <Field as={TextField} name="title" />

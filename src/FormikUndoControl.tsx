@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useFormikUndo } from './FormikUndo';
 
 
@@ -30,6 +30,13 @@ const defaultIcon: Record<ButtonKind, React.ComponentType> = {
 };
 
 
+const DefaultButton = (props: any) => {
+  return (
+    <button type="button" {...props} />
+  )
+}
+
+
 const rootStyle = {
   display: 'flex',
 };
@@ -55,7 +62,7 @@ export const FormikUndoControl = ({
     ...(showRedo === false ? [] : ['redo' as ButtonKind]),
   ];
 
-  const ButtonComponent: React.ComponentType | keyof JSX.IntrinsicElements = buttonComponent || 'button';
+  const ButtonComponent: React.ComponentType<any> = buttonComponent || DefaultButton;
 
   return (
     <div className={className} style={rootStyle}>
