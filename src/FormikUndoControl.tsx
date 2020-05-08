@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { useFormikUndo } from './FormikUndo';
 
 
@@ -23,10 +23,10 @@ const defaultTitles: Record<ButtonKind, string> = {
   redo: 'Redo',
 };
 
-const defaultIcon: Record<ButtonKind, ReactNode> = {
-  reset: '↺',
-  undo: '↶',
-  redo: '↷',
+const defaultIcon: Record<ButtonKind, React.ComponentType> = {
+  reset: () => <>↺</>,
+  undo: () => <>↶</>,
+  redo: () => <>↷</>,
 };
 
 

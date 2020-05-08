@@ -1,5 +1,5 @@
 import { createStyles, CssBaseline, makeStyles, Paper, TextField, Theme } from '@material-ui/core';
-import { Field, Form, Formik, useFormikContext } from 'formik'; // Using formik-undo's  formik module one folder up.
+import { Field, Form, Formik } from 'formik'; // Using formik-undo's  formik module one folder up.
 import { FormikUndoContextProvider, FormikUndoControl } from 'formik-undo';
 import React from 'react';
 import { MaterialFormikUndoControl } from './MaterialUiFormikUndoControl';
@@ -24,20 +24,33 @@ export const useStyles = makeStyles((theme: Theme) =>
       margin: theme.spacing(2),
       padding: theme.spacing(2),
     },
+    undoControlBar: {
+      display: 'flex',
+      marginBottom: theme.spacing(4),
+    },
+    undoControlBarTitle: {
+      display: 'block',
+      width: '20em',
+    },
   }),
 );
 
 
 
 const MyForm = () => {
-  // const { values } = useFormikContext<Article>();
-  // console.log('values', values);
+  const classes = useStyles();
   return (
     <Form>
+      <div className={classes.undoControlBar}>
+        <div className={classes.undoControlBarTitle}>with Material UI</div>
         <MaterialFormikUndoControl />
+      </div>
+      <div className={classes.undoControlBar}>
+        <div className={classes.undoControlBarTitle}>Vanilla</div>
         <FormikUndoControl />
-        <Field as={TextField} name="title" />
-        <Field as={TextField} name="content" />
+      </div>
+      <Field as={TextField} name="title" />
+      <Field as={TextField} name="content" />
     </Form>
   )
 };
