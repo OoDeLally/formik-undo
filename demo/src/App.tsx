@@ -3,7 +3,6 @@ import { Field, Form, Formik } from 'formik'; // Using formik-undo's  formik mod
 import { FormikUndoContextProvider, FormikUndoControl, useFormikUndo, useFormikUndoAutoSave } from 'formik-undo';
 import React, { useState } from 'react';
 import { MaterialFormikUndoControl } from './MaterialUiFormikUndoControl';
-import { repeat, sum, drop, initial } from 'lodash';
 
 
 
@@ -78,8 +77,7 @@ export const useStyles = makeStyles((theme: Theme) =>
 
 const SaveCheckpointButton = () => {
   const classes = useStyles();
-  const { saveCheckpoint, checkpoints, currentCheckpointIndex } = useFormikUndo<Article>();
-  console.log('currentCheckpointIndex', currentCheckpointIndex);
+  const { saveCheckpoint } = useFormikUndo<Article>();
   return (
     <div>
       <Button
@@ -91,13 +89,6 @@ const SaveCheckpointButton = () => {
       >
         Save now
       </Button>
-      <div style={{ fontFamily: 'monospace'}}>
-        {checkpoints.map((c) => `"${c.content}"`).join(' | ')}
-      </div>
-      <div style={{ fontFamily: 'monospace'}}>
-        {repeat(' ', sum(checkpoints.slice(0, currentCheckpointIndex).map(c => c.content.length + 5)))}
-         ^
-      </div>
     </div>
   );
 };

@@ -8,8 +8,6 @@ type FormikValues = Record<any, any>;
 
 interface FormikUndo<Values extends FormikValues> {
   saveCheckpoint: (values?: Values) => void;
-  checkpoints: Values[]; // DEBUG
-  currentCheckpointIndex: number; // DEBUG
   reset: () => void;
   undo: () => void;
   redo: () => void;
@@ -65,8 +63,6 @@ interface FormikUndoContextProviderProps {
 export const FormikUndoContextProvider = <Values extends FormikValues>({
   children
 }: FormikUndoContextProviderProps) => {
-  console.log('');
-  console.log('');
   const formikContext = useFormikContext<Values>();
   if (!formikContext) {
     throw new Error(
@@ -81,15 +77,10 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
   const formikValuesRef = useValueRef(formikValues);
   const checkpoints = useRef<Values[]>([formikValues]).current;
   const currentCheckpointIndexRef = useRef(0);
-  const [debugCurrentCheckpointIndex, setDebugCurrentCheckpointIndex] = useState<number>(0);
   const lastValuesModifiedByUsRef = useRef<Values | undefined>();
-  const [debugCheckpoints, setDebugCheckpoints] = useState<Values[]>(checkpoints);
 
   const currentCheckpointIndex = currentCheckpointIndexRef.current;
   const currentCheckpoint = checkpoints[currentCheckpointIndex];
-  console.log('formikValues', formikValues);
-  console.log('currentCheckpointIndex', currentCheckpointIndex);
-  console.log('currentCheckpoint', currentCheckpoint);
   const valuesChangedSinceCurrentCheckpoint = !areFormikValuesEqual(formikValues, currentCheckpoint);
   if (valuesChangedSinceCurrentCheckpoint) {
     // If values have been manually changed, we discard all history past current checkpoint.
@@ -107,26 +98,16 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
         console.error('Expected plain object. Received', values);
         throw new Error(`Expected plain object. Check the console.`);
       }
-      console.log('values', values);
-      console.log('formikValuesRef.current', formikValuesRef.current);
       const valuesToSave = values || formikValuesRef.current;
       if (areFormikValuesEqual(valuesToSave, lastValuesModifiedByUsRef.current)) {
-        console.log('This change was created by us. Saving aborted.');
         return; // This change was created by us. Saving aborted.
       }
       const currentCheckpoint = checkpoints[currentCheckpointIndexRef.current];
       if (areFormikValuesEqual(valuesToSave, currentCheckpoint)) {
-        console.log('valuesToSave', valuesToSave);
-        console.log('currentCheckpoint', currentCheckpoint);
-        console.log('The state of the form has not changed. Nothing to do.')
         return; // The state of the form has not changed. Nothing to do.
       }
-      console.log('valuesToSave', valuesToSave);
       checkpoints.push(valuesToSave);
-      setDebugCheckpoints([...checkpoints]);
-      console.log('checkPoints', checkpoints);
       currentCheckpointIndexRef.current++;
-      setDebugCurrentCheckpointIndex(val => val + 1);
     },
     [formikValuesRef, checkpoints, currentCheckpointIndexRef],
   );
@@ -139,7 +120,6 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
         throw new Error(`jumpToCheckpoint(${checkpointIndex}): out of bounds`)
       }
       lastValuesModifiedByUsRef.current = checkpoint;
-      setDebugCurrentCheckpointIndex(checkpointIndex);
       setFormikValues(checkpoint);
     },
     [setFormikValues],
@@ -160,7 +140,6 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
       if (!areFormikValuesEqualToCurrentCheckpoint()) {
         // Values have been changed by user.
         checkpoints.push(formikValuesRef.current); // save the current value (since we may redo later).
-        setDebugCheckpoints([...checkpoints]);
       }
       jumpToCheckpoint(0);
     },
@@ -175,7 +154,6 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
       } else {
         // Values have been changed by user.
         checkpoints.push(formikValuesRef.current); // save the current value (in case we need to redo later).
-        setDebugCheckpoints([...checkpoints]);
         jumpToCheckpoint(currentCheckpointIndexRef.current);
       }
     },
@@ -190,18 +168,9 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
   );
 
 
-  const mutatedCheckpointsIfChanged = !isEqual(checkpoints, debugCheckpoints)
-    ? [...checkpoints]
-    : checkpoints;
-
-  console.log('mutatedCheckpointsIfChanged', mutatedCheckpointsIfChanged);
-  useEffect(() => {
-    setDebugCheckpoints(mutatedCheckpointsIfChanged);
-  }, [mutatedCheckpointsIfChanged]);
-
   const context = useMemo(
-    () => ({ saveCheckpoint, undo, reset, redo, undoableCount, redoableCount, checkpoints: debugCheckpoints, currentCheckpointIndex: debugCurrentCheckpointIndex }),
-    [saveCheckpoint, undo, reset, redo, undoableCount, redoableCount, debugCheckpoints, debugCurrentCheckpointIndex ]
+    () => ({ saveCheckpoint, undo, reset, redo, undoableCount, redoableCount }),
+    [saveCheckpoint, undo, reset, redo, undoableCount, redoableCount ],
   );
 
   return (
