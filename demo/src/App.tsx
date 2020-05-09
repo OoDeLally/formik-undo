@@ -128,10 +128,10 @@ const RedoableCounter = () => {
 
 const AutoSaveControl = () => {
   const classes = useStyles();
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
   const [throttleDelay, setThrottleDelay] = useState(2000);
   const [debounceDelay, setDebounceDelay] = useState(1000);
-  useFormikUndoAutoSave({ enabled, throttleDelay, debounceDelay });
+  useFormikUndoAutoSave({ enabled, throttleDelay, debounceDelay, saveOnFieldChange: false });
   return (
     <div className={classes.autoSaveControl}>
       <FormControlLabel

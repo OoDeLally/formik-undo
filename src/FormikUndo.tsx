@@ -34,7 +34,7 @@ export const useFormikUndo = <Values extends FormikValues>(): FormikUndo<Values>
 /**
  * Test equality field by field (i.e. 1-deep equality).
  */
-const areFormikValuesEqual = <Values extends FormikValues>(a?: Values, b?: Values) => {
+export const areFormikValuesEqual = <Values extends FormikValues>(a: Values | undefined, b: Values | undefined) => {
   if (a === undefined) {
     return b === undefined;
   }
