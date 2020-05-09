@@ -1,5 +1,4 @@
 import { useFormikContext } from 'formik';
-import { chain } from 'lodash';
 import { useRef } from 'react';
 import { areFormikValuesEqual, useFormikUndo } from './FormikUndo';
 import { useEffectAfterFirstChange, useThrottler, useValueRef } from './hooks';
@@ -36,10 +35,15 @@ const areStringArrayElementsEqual = (arrayA: string[], arrayB: string[]) => {
 };
 
 
+const getModifiedFieldsKeys = <T extends Record<any, unknown>>(arrayA: T, arrayB: T) => {
+  const set = new Set([...Object.keys(arrayA), ...Object.keys(arrayB)]);
+  return Array.from(set.values()).filter(key => arrayA[key] !== arrayB[key]);
+};
+
+
 export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoSaveOptions = {}) => {
   const { throttleDelay, enabled, saveOnFieldChange } = { ...defaultOptions, ...options };
   const { values } = useFormikContext<T>();
-  // console.log('values', values);
   const previousValuesRef = useRef<T>(values);
   const previouslyModifiedFieldsRef = useRef<(keyof T)[]>([]);
   const { saveCheckpoint, didCreateCurrentValues } = useFormikUndo();
@@ -72,10 +76,7 @@ export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoS
       }
 
       if (saveOnFieldChange) {
-        const modifiedFieldsKeys = chain([...Object.keys(values), ...Object.keys(previousValues)])
-          .uniq()
-          .filter(key => values[key] !== previousValues[key])
-          .value() as (keyof T)[];
+        const modifiedFieldsKeys = getModifiedFieldsKeys(values, previousValues);
         const areModifiedFieldsDifferentFromLastTime = !areStringArrayElementsEqual(
           modifiedFieldsKeys as string[],
           previouslyModifiedFields as string[]

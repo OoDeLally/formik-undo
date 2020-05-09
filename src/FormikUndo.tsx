@@ -1,5 +1,4 @@
 import { useFormikContext } from 'formik';
-import { isPlainObject } from 'lodash';
 import React, { ReactNode, useCallback, useContext, useMemo, useRef } from 'react';
 import { useValueRef } from './hooks';
 
@@ -95,10 +94,6 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
 
   const saveCheckpoint = useCallback(
     (values?: Values) => {
-      if (!(values === undefined || isPlainObject(values))) {
-        console.error('Expected plain object. Received', values);
-        throw new Error(`Expected plain object. Check the console.`);
-      }
       const valuesToSave = values || formikValuesRef.current;
       if (areFormikValuesEqual(valuesToSave, lastValuesModifiedByUsRef.current)) {
         return; // This change was created by us. Saving aborted.

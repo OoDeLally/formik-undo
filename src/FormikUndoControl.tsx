@@ -1,4 +1,5 @@
-import React, { useCallback } from 'react';
+/* eslint-disable react/display-name */
+import React from 'react';
 import { useFormikUndo } from './FormikUndo';
 
 
@@ -33,8 +34,8 @@ const defaultIcon: Record<ButtonKind, React.ComponentType> = {
 const DefaultButton = (props: any) => {
   return (
     <button type="button" {...props} />
-  )
-}
+  );
+};
 
 
 const rootStyle = {
