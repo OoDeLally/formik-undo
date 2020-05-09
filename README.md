@@ -2,6 +2,8 @@
 
 Provide the ability to undo / redo modifications in a Formik form.
 
+Uses Typescript and React hooks.
+
 
 ![screenshot](https://github.com/OoDeLally/formik-undo/blob/master/demo/formik-undo.gif)
 
@@ -114,16 +116,16 @@ const MyForm = () => {
 
 `<FormikUndoControl>` accepts props:
 
-| Name                       | Type                                                    | Default                 | Description                                   |
-| ---------------------------|---------------------------------------------------------|-------------------------|-----------------------------------------------|
-| `showReset`                | `boolean`                                               | `true`                  | Show the `reset` button.                      |
-| `showRedo`                 | `boolean`                                               | `true`                  | Show the `redo` button.                       |
-| `disabled`                 | `boolean`                                               | `false`                 | Disable every control.                        |
-| `className`                | `string`                                                |                         | Add extra classes to the control container.   |
-| `buttonTitles`             | `Record<('reset' \| 'undo' \| 'redo'), string \| null>` | "Reset", "Undo", "Redo" | Override the `title` attribute of the button. |
-| `buttonClasses`            | `Record<('reset' \| 'undo' \| 'redo'), string>`         | {}                      | Add extra classes to some of the buttons.     |
-| `buttonIcons`              | `Record<('reset' \| 'undo' \| 'redo'), ComponentType>`  |  "↺", "↶", "↷"          | Override the buttons' content.                |
-| `buttonComponent`          | `ComponentType`                                         | <button>                | Override the buttons' component.              |
+| Name                       | Type                                                    | Default                       | Description                                   |
+| ---------------------------|---------------------------------------------------------|-------------------------------|-----------------------------------------------|
+| `showReset`                | `boolean`                                               | `true`                        | Show the `reset` button.                      |
+| `showRedo`                 | `boolean`                                               | `true`                        | Show the `redo` button.                       |
+| `disabled`                 | `boolean`                                               | `false`                       | Disable every control.                        |
+| `className`                | `string`                                                |                               | Add extra classes to the control container.   |
+| `buttonTitles`             | `Record<('reset' \| 'undo' \| 'redo'), string \| null>` | `"Reset"`, `"Undo"`, `"Redo"` | Override the `title` attribute of the button. |
+| `buttonClasses`            | `Record<('reset' \| 'undo' \| 'redo'), string>`         | `{}`                          | Add extra classes to some of the buttons.     |
+| `buttonIcons`              | `Record<('reset' \| 'undo' \| 'redo'), ComponentType>`  |  `"↺"`, `"↶"`, `"↷"`          | Override the buttons' content.                |
+| `buttonComponent`          | `ComponentType`                                         | <button>                      | Override the buttons' component.              |
 
 
 
