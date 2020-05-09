@@ -3,17 +3,18 @@ import { Field, Form, Formik } from 'formik'; // Using formik-undo's  formik mod
 import { FormikUndoContextProvider, FormikUndoControl, useFormikUndo, useFormikUndoAutoSave } from 'formik-undo';
 import React, { useState } from 'react';
 import { MaterialFormikUndoControl } from './MaterialUiFormikUndoControl';
+import { repeat, sum, drop, initial } from 'lodash';
 
 
 
 interface Article {
-  title: string;
+  // title: string;
   content: string;
 }
 
 
 const initialValues = {
-  title: 'My New Article',
+  // title: 'My New Article',
   content: '',
 };
 
@@ -77,17 +78,27 @@ export const useStyles = makeStyles((theme: Theme) =>
 
 const SaveCheckpointButton = () => {
   const classes = useStyles();
-  const { saveCheckpoint } = useFormikUndo();
+  const { saveCheckpoint, checkpoints, currentCheckpointIndex } = useFormikUndo<Article>();
+  console.log('currentCheckpointIndex', currentCheckpointIndex);
   return (
-    <Button
-      className={classes.manualSaveButton}
-      variant="contained"
-      size="small"
-      onClick={() => saveCheckpoint()}
-      title="Create a checkpoint now in the undo history"
-    >
-      Save now
-    </Button>
+    <div>
+      <Button
+        className={classes.manualSaveButton}
+        variant="contained"
+        size="small"
+        onClick={() => saveCheckpoint()}
+        title="Create a checkpoint now in the undo history"
+      >
+        Save now
+      </Button>
+      <div style={{ fontFamily: 'monospace'}}>
+        {checkpoints.map((c) => `"${c.content}"`).join(' | ')}
+      </div>
+      <div style={{ fontFamily: 'monospace'}}>
+        {repeat(' ', sum(checkpoints.slice(0, currentCheckpointIndex).map(c => c.content.length + 5)))}
+         ^
+      </div>
+    </div>
   );
 };
 
@@ -168,7 +179,7 @@ const AutoSaveControl = () => {
 const Sidebar = () => {
   return (
     <>
-      <SaveCheckpointButton />
+      {/* <SaveCheckpointButton /> */}
       <UndoableCounter/>
       <RedoableCounter/>
       <AutoSaveControl />
@@ -202,6 +213,7 @@ const MyForm = () => {
         variant="outlined" multiline
         rows={10}
       />
+      <SaveCheckpointButton />
     </Form>
   )
 };
