@@ -53,72 +53,75 @@ export const useEffectAfterFirstChange =
 };
 
 
-export const useThrottledValue = <T extends unknown>(latestValue: T, delay: number, resetTimer?: boolean) => {
-  const [value, setValue] = useState<T>(latestValue);
+export const useThrottledValue = <T extends unknown>(delay: number) => {
+  const [value, setValue] = useState<T>();
+  const latestValueRef = useRef<T>();
   const isIdleRef = useRef(true);
-  const latestKnownValueRef = useValueRef<T>(latestValue);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
-  const restartTimer = useCallback(
-    () => {
-      isIdleRef.current = false;
-      timerRef.current = setTimeout(
-        () => {
+  const getThrottledValue = useCallback(
+    (latestValue: T, resetTimer?: boolean): T => {
+      if (resetTimer) {
+        timerRef.current && clearTimeout(timerRef.current);
+        isIdleRef.current = true;
+        return latestValue;
+      }
+      latestValueRef.current = latestValue;
+      console.log('isIdleRef.current', isIdleRef.current);
+      if (isIdleRef.current) {
+        // Idle. Use the latest value and start throttling.
+        isIdleRef.current = false;
+        console.log('start throttle timer');
+        timerRef.current = setTimeout(() => {
+          console.log('debounce time out');
           isIdleRef.current = true;
-        },
-        delay,
-      );
+          setValue(latestValueRef.current)
+        }, delay);
+        return latestValue;
+      } else {
+        // Not idle, we simply way until the timer times out.
+        return value!;
+      }
     },
     [delay],
   );
-  useEffectAfterFirstChange(
-    () => {
-      latestKnownValueRef.current = latestValue;
-      if (isIdleRef.current) {
-        setValue(latestValue);
-        restartTimer();
-      }
-    },
-    latestValue,
-    [restartTimer],
-  );
-  useEffect(
-    () => {
-      return () => {
-        if (timerRef.current) {
-          clearTimeout(timerRef.current); // Clear the timer upon unmounting.
-        }
-      };
-    },
-    [],
-  );
-  return isIdleRef.current ? latestKnownValueRef.current : value;
+  useEffect(() => {
+    return () => {
+      timerRef.current && clearTimeout(timerRef.current);
+    }
+  }, []);
+  return getThrottledValue;
 };
 
 
-export const useDebouncedValue = <T extends unknown>(latestValue: T, delay: number, resetTimer?: boolean): T => {
-  const [value, setValue] = useState<T>(latestValue);
+export const useDebouncedValue = <T extends unknown>(delay: number) => {
+  const [, valueRef, setValue] = useStateAndRef<T | undefined>(undefined);
+  const latestValueRef = useRef<T>();
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
-  const scheduleNewValue = useCallback(
-    (newValue: T) => {
-      timerRef.current = setTimeout(
-        () => {
-          setValue(newValue);
-        },
-        delay,
-      );
+  const getDebouncedValue = useCallback(
+    (latestValue: T, resetTimer?: boolean): T => {
+      console.log('resetTimer', resetTimer);
+      latestValueRef.current = latestValue;
+      timerRef.current && clearTimeout(timerRef.current);
+      if (resetTimer) {
+        setValue(latestValue);
+        return latestValue;
+      } else {
+        if (latestValue !== valueRef.current) {
+          console.log('start debounce timer');
+          timerRef.current = setTimeout(() => {
+            console.log('debounce time out');
+            setValue(latestValueRef.current)
+          }, delay);
+        }
+        return valueRef.current !== undefined ? valueRef.current : latestValue;
+      }
     },
     [delay],
   );
-  useEffect(
-    () => {
-      scheduleNewValue(latestValue);
-      return () => {
-        if (timerRef.current) {
-          clearTimeout(timerRef.current); // Clear the timer upon unmounting.
-        }
-      };
-    },
-    [latestValue, scheduleNewValue],
-  );
-  return value;
+  useEffect(() => {
+    return () => {
+      timerRef.current && clearTimeout(timerRef.current);
+    }
+  }, []);
+  return getDebouncedValue;
 };

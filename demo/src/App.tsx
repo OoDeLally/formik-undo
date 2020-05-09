@@ -128,7 +128,7 @@ const AutoSaveControl = () => {
   const classes = useStyles();
   const [enabled, setEnabled] = useState(true);
   const [throttleDelay, setThrottleDelay] = useState(2000);
-  const [debounceDelay, setDebounceDelay] = useState(500);
+  const [debounceDelay, setDebounceDelay] = useState(1000);
   useFormikUndoAutoSave({ enabled, throttleDelay, debounceDelay });
   return (
     <div className={classes.autoSaveControl}>

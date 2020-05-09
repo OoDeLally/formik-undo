@@ -28,11 +28,12 @@ export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoS
   const previousValuesRef = useRef<T>(values);
   const previousModifiedFieldsRef = useRef<(keyof T)[]>([]);
   const { saveCheckpoint } = useFormikUndo();
+  const getThrottledValue = useThrottledValue<T>(throttleDelay);
+  const getDebouncedValue = useDebouncedValue<T>(debounceDelay);
 
   const wereFormikValuesChanged = values !== previousValuesRef.current;
 
-  let valueToMonitorSource: 'direct' | 'timed';
-
+  let resetTimer = false;
   if (wereFormikValuesChanged && saveOnFieldChange) {
     const modifiedValues = pickBy(values, (val, key) => val !== previousValuesRef.current[key]) as Partial<T>;
     const modifiedFields = Object.keys(modifiedValues) as (keyof T)[];
@@ -41,21 +42,15 @@ export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoS
       some(previousModifiedFieldsRef.current, field => !modifiedFields.includes(field))
 
     if (aDifferentSetOfFieldsWasModified) {
-      // FIXME: actually save the last state of `values`???
-      valueToMonitorSource = 'direct';
+      resetTimer = true;
       previousModifiedFieldsRef.current = modifiedFields;
-    } else {
-      valueToMonitorSource = 'timed';
     }
-  } else {
-    valueToMonitorSource = 'timed';
   }
 
-  const resetTimers = valueToMonitorSource === 'direct';
-  const throttledValues = useThrottledValue(values, throttleDelay, resetTimers);
-  const throttledDebouncedValues = useDebouncedValue(throttledValues, debounceDelay, resetTimers);
-
-  const valueToMonitor = valueToMonitorSource === 'direct' ? values : throttledDebouncedValues;
+  console.log('values', values);
+  const valuesToMonitor = getDebouncedValue(values, resetTimer);
+  console.log('valuesToMonitor', valuesToMonitor);
+  // const valuesToMonitor = getDebouncedValue(getThrottledValue(values, resetTimer), resetTimer);
 
   previousValuesRef.current = values;
 
@@ -66,7 +61,7 @@ export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoS
       }
       saveCheckpoint();
     },
-    valueToMonitor,
+    valuesToMonitor,
     [enabled],
   );
 };
