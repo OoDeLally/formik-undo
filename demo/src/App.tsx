@@ -1,4 +1,4 @@
-import { Button, Checkbox, createStyles, CssBaseline, FormControlLabel, makeStyles, Paper, TextField, Theme } from '@material-ui/core';
+import { Button, Checkbox, createStyles, CssBaseline, FormControlLabel, makeStyles, Paper, TextField, Theme, Divider, List, ListItem } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik'; // Using formik-undo's  formik module one folder up.
 import { FormikUndoContextProvider, FormikUndoControl, useFormikUndo, useFormikUndoAutoSave } from 'formik-undo';
 import React, { useState } from 'react';
@@ -26,16 +26,18 @@ export const useStyles = makeStyles((theme: Theme) =>
     main: {
       margin: theme.spacing(2),
       padding: theme.spacing(2),
-      flex: '1',
+      flex: 3,
     },
     sidebar: {
+      display: 'block',
       margin: theme.spacing(2),
       padding: theme.spacing(2),
-      flex: 0,
+      flex: 1,
       flexDirection: 'column',
     },
     manualSaveButton: {
       display: 'block',
+      marginBottom: theme.spacing(2),
     },
     autoSaveControl: {
       display: 'flex',
@@ -44,12 +46,14 @@ export const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(4),
     },
     autoSaveControlField: {
-      marginTop: theme.spacing(2),
+      marginTop: theme.spacing(1),
+      marginBottom: theme.spacing(1),
       display: 'block',
       width: '5em',
     },
     undoableCounter: {
       marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2),
       width: '9em',
     },
     undoControlBar: {
@@ -140,23 +144,29 @@ const AutoSaveControl = () => {
         }
         label="AutoSave"
       />
-      <FormControlLabel
-        control={
-          <Checkbox checked={saveOnFieldChange} onChange={(e, checked) => setSaveOnFieldChange(checked)} />
-        }
-        label="Save On Field Change"
-      />
-      <TextField
-        className={classes.autoSaveControlField}
-        disabled={!enabled}
-        type="number"
-        label="Throttle"
-        size="small"
-        value={throttleDelay}
-        onChange={
-          (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setThrottleDelay(+e.target.value)
-        }
-      />
+      <List>
+        <ListItem>
+          <FormControlLabel
+            control={
+              <Checkbox checked={saveOnFieldChange} disabled={!enabled} onChange={(e, checked) => setSaveOnFieldChange(checked)} />
+            }
+            label="Save on field change"
+          />
+        </ListItem>
+        <ListItem>
+          <TextField
+            className={classes.autoSaveControlField}
+            disabled={!enabled}
+            type="number"
+            label="Throttle"
+            size="small"
+            value={throttleDelay}
+            onChange={
+              (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setThrottleDelay(+e.target.value)
+            }
+          />
+        </ListItem>
+      </List>
     </div>
   );
 };
@@ -166,8 +176,10 @@ const Sidebar = () => {
   return (
     <>
       <SaveCheckpointButton />
+      <Divider/>
       <UndoableCounter/>
       <RedoableCounter/>
+      <Divider/>
       <AutoSaveControl />
     </>
   )
@@ -198,7 +210,6 @@ const MyForm = () => {
         variant="outlined" multiline
         rows={10}
       />
-      <SaveCheckpointButton />
     </Form>
   )
 };
