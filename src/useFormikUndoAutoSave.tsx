@@ -1,4 +1,5 @@
 import { useFormikContext } from 'formik';
+import { chain } from 'lodash';
 import { useRef } from 'react';
 import { areFormikValuesEqual, useFormikUndo } from './FormikUndo';
 import { useEffectAfterFirstChange, useThrottler, useValueRef } from './hooks';
@@ -19,12 +20,28 @@ const defaultOptions: AutoSaveConfig = {
 };
 
 
+const areStringArrayElementsEqual = (arrayA: string[], arrayB: string[]) => {
+  // Ignore the order.
+  if (arrayA.length !== arrayB.length) {
+    return false;
+  }
+  const sortedArrayA = arrayA.sort();
+  const sortedArrayB = arrayB.sort();
+  for (const index in sortedArrayA) {
+    if (sortedArrayA[index] !== sortedArrayB[index]) {
+      return false;
+    }
+  }
+  return true;
+};
+
+
 export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoSaveOptions = {}) => {
   const { throttleDelay, enabled, saveOnFieldChange } = { ...defaultOptions, ...options };
   const { values } = useFormikContext<T>();
   // console.log('values', values);
   const previousValuesRef = useRef<T>(values);
-  const previousModifiedFieldsRef = useRef<(keyof T)[]>([]);
+  const previouslyModifiedFieldsRef = useRef<(keyof T)[]>([]);
   const { saveCheckpoint, didCreateCurrentValues } = useFormikUndo();
   const didCreateCurrentValuesRef = useValueRef(didCreateCurrentValues);
   const [throttledValue, submitValueToThrottler] = useThrottler<T>(values, throttleDelay);
@@ -44,18 +61,35 @@ export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoS
       }
 
       if (didCreateCurrentValuesRef.current) {
-        return;
+        return; // This value was created by formik-undo and we should not autosave it.
       }
 
-      if (areFormikValuesEqual(values, previousValuesRef.current)) {
-        return;
+      const previousValues = previousValuesRef.current;
+      const previouslyModifiedFields = previouslyModifiedFieldsRef.current;
+
+      if (areFormikValuesEqual(values, previousValues)) {
+        return; // Nothing actually changed, even though the containing object may be different.
       }
 
       if (saveOnFieldChange) {
-        // FIXME
-        throw new Error('not implemented');
+        const modifiedFieldsKeys = chain([...Object.keys(values), ...Object.keys(previousValues)])
+          .uniq()
+          .filter(key => values[key] !== previousValues[key])
+          .value() as (keyof T)[];
+        const areModifiedFieldsDifferentFromLastTime = !areStringArrayElementsEqual(
+          modifiedFieldsKeys as string[],
+          previouslyModifiedFields as string[]
+        );
+        if (areModifiedFieldsDifferentFromLastTime) {
+          previouslyModifiedFieldsRef.current = modifiedFieldsKeys;
+          // The user started modifying other fields. We force-save the last value of the previously-monitored fields.
+          const valuesBeforeChangingField = previousValuesRef.current;
+          submitValueToThrottler(() => valuesBeforeChangingField, true);
+        } else {
+          // Otherwise we just do as usual.
+          submitValueToThrottler(() => previousValuesRef.current);
+        }
       } else {
-        // console.log('submitValueToThrottler', values);
         submitValueToThrottler(() => previousValuesRef.current);
       }
       previousValuesRef.current = values;

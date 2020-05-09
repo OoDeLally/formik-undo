@@ -7,13 +7,13 @@ import { MaterialFormikUndoControl } from './MaterialUiFormikUndoControl';
 
 
 interface Article {
-  // title: string;
+  title: string;
   content: string;
 }
 
 
 const initialValues = {
-  // title: 'My New Article',
+  title: '',
   content: '',
 };
 
@@ -130,7 +130,8 @@ const AutoSaveControl = () => {
   const classes = useStyles();
   const [enabled, setEnabled] = useState(true);
   const [throttleDelay, setThrottleDelay] = useState(2000);
-  useFormikUndoAutoSave({ enabled, throttleDelay, saveOnFieldChange: false });
+  const [saveOnFieldChange, setSaveOnFieldChange] = useState(true);
+  useFormikUndoAutoSave({ enabled, throttleDelay, saveOnFieldChange });
   return (
     <div className={classes.autoSaveControl}>
       <FormControlLabel
@@ -138,6 +139,12 @@ const AutoSaveControl = () => {
           <Checkbox checked={enabled} onChange={(e, checked) => setEnabled(checked)} />
         }
         label="AutoSave"
+      />
+      <FormControlLabel
+        control={
+          <Checkbox checked={saveOnFieldChange} onChange={(e, checked) => setSaveOnFieldChange(checked)} />
+        }
+        label="Save On Field Change"
       />
       <TextField
         className={classes.autoSaveControlField}
@@ -165,7 +172,6 @@ const Sidebar = () => {
     </>
   )
 };
-
 
 
 const MyForm = () => {
@@ -198,25 +204,6 @@ const MyForm = () => {
 };
 
 
-
-// const TimerTester = () => {
-//   const [value, setValue] = useState<number>(0);
-//   const [timedValue, submitNewValue] = useThrottledValue<number>(value, 1000);
-//   useEffect(() => {
-//     submitNewValue(value);
-//   }, [value, submitNewValue]);
-//   return (
-//     <div>
-//       <Button onClick={() => setValue(val => val + 1)}>Inc</Button>
-//       <TextField disabled={true} label="value" value={value}/>
-//       <TextField disabled={true} label="Result" value={timedValue}/>
-//     </div>
-//   );
-// };
-
-
-
-
 const App = () => {
   const classes = useStyles();
 
@@ -227,7 +214,6 @@ const App = () => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-        {/* <TimerTester/> */}
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}
