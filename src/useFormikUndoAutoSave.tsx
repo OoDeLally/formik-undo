@@ -52,10 +52,13 @@ export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoS
 
   useEffectAfterFirstChange(
     () => {
+      if (!enabled) {
+        return;
+      }
       saveCheckpoint(throttledValue);
     },
     throttledValue,
-    [saveCheckpoint],
+    [saveCheckpoint, enabled],
   );
 
   useEffectAfterFirstChange(
