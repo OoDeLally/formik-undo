@@ -1,6 +1,6 @@
 import { useFormikContext } from 'formik';
-import { isEqual, isPlainObject, some } from 'lodash';
-import React, { ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { isPlainObject } from 'lodash';
+import React, { ReactNode, useCallback, useContext, useMemo, useRef } from 'react';
 import { useValueRef } from './hooks';
 
 type FormikValues = Record<any, any>;
@@ -117,12 +117,12 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
       currentCheckpointIndexRef.current = checkpointIndex;
       const checkpoint = checkpoints[checkpointIndex];
       if (checkpoint === undefined) {
-        throw new Error(`jumpToCheckpoint(${checkpointIndex}): out of bounds`)
+        throw new Error(`jumpToCheckpoint(${checkpointIndex}): out of bounds`);
       }
       lastValuesModifiedByUsRef.current = checkpoint;
       setFormikValues(checkpoint);
     },
-    [setFormikValues],
+    [setFormikValues, checkpoints],
   );
 
 
@@ -131,7 +131,7 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
       const currentCheckpoint = checkpoints[currentCheckpointIndexRef.current];
       return areFormikValuesEqual(formikValuesRef.current, currentCheckpoint);
     },
-    [checkpoints],
+    [checkpoints, formikValuesRef],
   );
 
 
@@ -143,7 +143,7 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
       }
       jumpToCheckpoint(0);
     },
-    [jumpToCheckpoint, checkpoints, formikValuesRef],
+    [jumpToCheckpoint, checkpoints, formikValuesRef, areFormikValuesEqualToCurrentCheckpoint],
   );
 
   const undo = useCallback(
@@ -157,20 +157,20 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
         jumpToCheckpoint(currentCheckpointIndexRef.current);
       }
     },
-    [jumpToCheckpoint, checkpoints, formikValuesRef],
+    [jumpToCheckpoint, checkpoints, formikValuesRef, areFormikValuesEqualToCurrentCheckpoint],
   );
 
   const redo = useCallback(
     () => {
       jumpToCheckpoint(currentCheckpointIndexRef.current + 1);
     },
-    [jumpToCheckpoint, checkpoints, currentCheckpointIndexRef],
+    [jumpToCheckpoint, currentCheckpointIndexRef],
   );
 
 
   const context = useMemo(
     () => ({ saveCheckpoint, undo, reset, redo, undoableCount, redoableCount }),
-    [saveCheckpoint, undo, reset, redo, undoableCount, redoableCount ],
+    [saveCheckpoint, undo, reset, redo, undoableCount, redoableCount],
   );
 
   return (

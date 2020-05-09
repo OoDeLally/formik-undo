@@ -48,6 +48,7 @@ export const useEffectAfterFirstChange =
         return effectRef.current();
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [...(otherDeps || []), effectRef, depToMonitor, initialDepValueRef],
   );
 };
@@ -69,7 +70,7 @@ export const useThrottler = <T extends unknown>(initialValue: T, delay: number) 
         }
       }, delay);
     },
-    [delay],
+    [delay, setValue, timerRef, valueRef],
   );
   const submitNewValue = useCallback(
     (newValue: T, resetTimer?: boolean) => {
@@ -82,12 +83,12 @@ export const useThrottler = <T extends unknown>(initialValue: T, delay: number) 
         setValue(newValue);
       }
     },
-    [delay],
+    [delay, setValue, timerRef, valueRef, restartTimer],
   );
   useEffect(() => {
     return () => {
       timerRef.current && clearTimeout(timerRef.current);
-    }
+    };
   }, []);
   return [valueRef.current, submitNewValue] as const;
 };
@@ -108,16 +109,16 @@ export const useDebouncer = <T extends unknown>(initialValue: T, delay: number) 
         setValue(newValue);
       } else {
         timerRef.current = setTimeout(() => {
-          setValue(newestValueRef.current)
+          setValue(newestValueRef.current);
         }, delay);
       }
     },
-    [delay],
+    [delay, setValue, timerRef, valueRef],
   );
   useEffect(() => {
     return () => {
       timerRef.current && clearTimeout(timerRef.current);
-    }
+    };
   }, []);
   return [valueRef.current, submitNewValue] as const;
 };
