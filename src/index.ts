@@ -3,3 +3,5 @@ export { FormikUndoControl } from './FormikUndoControl';
 export { useFormikUndoAutoSave } from './useFormikUndoAutoSave';
 
 export type { FormikUndoControlProps } from './FormikUndoControl';
+
+export { useDebouncedValue, useThrottledValue } from './hooks';

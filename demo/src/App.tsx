@@ -1,7 +1,7 @@
 import { createStyles, CssBaseline, makeStyles, Paper, TextField, Theme, Button, Checkbox, FormControlLabel } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik'; // Using formik-undo's  formik module one folder up.
-import { FormikUndoContextProvider, FormikUndoControl, useFormikUndoAutoSave, useFormikUndo } from 'formik-undo';
-import React, { useState } from 'react';
+import { FormikUndoContextProvider, FormikUndoControl, useFormikUndoAutoSave, useFormikUndo, useDebouncedValue, useThrottledValue } from 'formik-undo';
+import React, { useState, useEffect } from 'react';
 import { MaterialFormikUndoControl } from './MaterialUiFormikUndoControl';
 
 
@@ -207,6 +207,25 @@ const MyForm = () => {
 };
 
 
+
+const TimerTester = () => {
+  const [value, setValue] = useState<number>(0);
+  const [timedValue, submitNewValue] = useThrottledValue<number>(value, 1000);
+  useEffect(() => {
+    submitNewValue(value);
+  }, [value, submitNewValue]);
+  return (
+    <div>
+      <Button onClick={() => setValue(val => val + 1)}>Inc</Button>
+      <TextField disabled={true} label="value" value={value}/>
+      <TextField disabled={true} label="Result" value={timedValue}/>
+    </div>
+  );
+};
+
+
+
+
 const App = () => {
   const classes = useStyles();
 
@@ -217,6 +236,7 @@ const App = () => {
   return (
     <div className={classes.root}>
       <CssBaseline />
+        <TimerTester/>
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}

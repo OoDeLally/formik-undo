@@ -28,40 +28,40 @@ export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoS
   const previousValuesRef = useRef<T>(values);
   const previousModifiedFieldsRef = useRef<(keyof T)[]>([]);
   const { saveCheckpoint } = useFormikUndo();
-  const getThrottledValue = useThrottledValue<T>(throttleDelay);
-  const getDebouncedValue = useDebouncedValue<T>(debounceDelay);
+  // const getThrottledValue = useThrottledValue<T>(throttleDelay);
+  // const getDebouncedValue = useDebouncedValue<T>(debounceDelay);
 
-  const wereFormikValuesChanged = values !== previousValuesRef.current;
+  // const wereFormikValuesChanged = values !== previousValuesRef.current;
 
-  let resetTimer = false;
-  if (wereFormikValuesChanged && saveOnFieldChange) {
-    const modifiedValues = pickBy(values, (val, key) => val !== previousValuesRef.current[key]) as Partial<T>;
-    const modifiedFields = Object.keys(modifiedValues) as (keyof T)[];
-    const aDifferentSetOfFieldsWasModified =
-      modifiedFields.length !== previousModifiedFieldsRef.current.length ||
-      some(previousModifiedFieldsRef.current, field => !modifiedFields.includes(field))
+  // let resetTimer = false;
+  // if (wereFormikValuesChanged && saveOnFieldChange) {
+  //   const modifiedValues = pickBy(values, (val, key) => val !== previousValuesRef.current[key]) as Partial<T>;
+  //   const modifiedFields = Object.keys(modifiedValues) as (keyof T)[];
+  //   const aDifferentSetOfFieldsWasModified =
+  //     modifiedFields.length !== previousModifiedFieldsRef.current.length ||
+  //     some(previousModifiedFieldsRef.current, field => !modifiedFields.includes(field))
 
-    if (aDifferentSetOfFieldsWasModified) {
-      resetTimer = true;
-      previousModifiedFieldsRef.current = modifiedFields;
-    }
-  }
+  //   if (aDifferentSetOfFieldsWasModified) {
+  //     resetTimer = true;
+  //     previousModifiedFieldsRef.current = modifiedFields;
+  //   }
+  // }
 
-  console.log('values', values);
-  const valuesToMonitor = getDebouncedValue(values, resetTimer);
-  console.log('valuesToMonitor', valuesToMonitor);
-  // const valuesToMonitor = getDebouncedValue(getThrottledValue(values, resetTimer), resetTimer);
+  // console.log('values', values);
+  // const valuesToMonitor = getDebouncedValue(values, resetTimer);
+  // console.log('valuesToMonitor', valuesToMonitor);
+  // // const valuesToMonitor = getDebouncedValue(getThrottledValue(values, resetTimer), resetTimer);
 
-  previousValuesRef.current = values;
+  // previousValuesRef.current = values;
 
-  useEffectAfterFirstChange(
-    () => {
-      if (!enabled) {
-        return;
-      }
-      saveCheckpoint();
-    },
-    valuesToMonitor,
-    [enabled],
-  );
+  // useEffectAfterFirstChange(
+  //   () => {
+  //     if (!enabled) {
+  //       return;
+  //     }
+  //     saveCheckpoint(valuesToMonitor);
+  //   },
+  //   valuesToMonitor,
+  //   [enabled],
+  // );
 };

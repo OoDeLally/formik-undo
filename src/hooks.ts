@@ -25,8 +25,8 @@ export const useStateAndRef = <T>(initialValue: T) => {
   const setValueAndRef = useCallback(
     (setStateAction: SetStateAction<T>) => {
       const newValue = isFunction(setStateAction) ? setStateAction(ref.current) : setStateAction;
-      setValue(newValue);
       ref.current = newValue;
+      setValue(newValue);
     },
     [setValue, ref],
   );
@@ -53,33 +53,33 @@ export const useEffectAfterFirstChange =
 };
 
 
-export const useThrottledValue = <T extends unknown>(delay: number) => {
-  const [value, setValue] = useState<T>();
-  const latestValueRef = useRef<T>();
-  const isIdleRef = useRef(true);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
-  const getThrottledValue = useCallback(
-    (latestValue: T, resetTimer?: boolean): T => {
-      if (resetTimer) {
-        timerRef.current && clearTimeout(timerRef.current);
-        isIdleRef.current = true;
-        return latestValue;
+export const useThrottledValue = <T extends unknown>(initialValue: T, delay: number) => {
+  const [, valueRef, setValue] = useStateAndRef<T>(initialValue);
+  const newestValueRef = useRef<T>(initialValue);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const restartTimer = useCallback(
+    () => {
+      timerRef.current = setTimeout(() => {
+        if (newestValueRef.current !== valueRef.current) {
+          restartTimer();
+          setValue(newestValueRef.current);
+        } else {
+          timerRef.current = null;
+        }
+      }, delay);
+    },
+    [delay],
+  );
+  const submitNewValue = useCallback(
+    (newValue: T, resetTimer?: boolean) => {
+      if (newValue === valueRef.current) {
+        return;
       }
-      latestValueRef.current = latestValue;
-      console.log('isIdleRef.current', isIdleRef.current);
-      if (isIdleRef.current) {
-        // Idle. Use the latest value and start throttling.
-        isIdleRef.current = false;
-        console.log('start throttle timer');
-        timerRef.current = setTimeout(() => {
-          console.log('debounce time out');
-          isIdleRef.current = true;
-          setValue(latestValueRef.current)
-        }, delay);
-        return latestValue;
-      } else {
-        // Not idle, we simply way until the timer times out.
-        return value!;
+      newestValueRef.current = newValue;
+      if (delay === 0 || resetTimer || timerRef.current === null) {
+        restartTimer();
+        setValue(newValue);
       }
     },
     [delay],
@@ -89,31 +89,30 @@ export const useThrottledValue = <T extends unknown>(delay: number) => {
       timerRef.current && clearTimeout(timerRef.current);
     }
   }, []);
-  return getThrottledValue;
+  return [
+    valueRef.current,
+    submitNewValue,
+  ] as const;
 };
 
 
-export const useDebouncedValue = <T extends unknown>(delay: number) => {
-  const [, valueRef, setValue] = useStateAndRef<T | undefined>(undefined);
-  const latestValueRef = useRef<T>();
+export const useDebouncedValue = <T extends unknown>(initialValue: T, delay: number) => {
+  const [, valueRef, setValue] = useStateAndRef<T>(initialValue);
+  const newestValueRef = useRef<T>(initialValue);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
-  const getDebouncedValue = useCallback(
-    (latestValue: T, resetTimer?: boolean): T => {
-      console.log('resetTimer', resetTimer);
-      latestValueRef.current = latestValue;
+  const submitNewValue = useCallback(
+    (newValue: T, resetTimer?: boolean) => {
+      if (newValue === valueRef.current) {
+        return;
+      }
+      newestValueRef.current = newValue;
       timerRef.current && clearTimeout(timerRef.current);
-      if (resetTimer) {
-        setValue(latestValue);
-        return latestValue;
+      if (delay === 0 || resetTimer) {
+        setValue(newValue);
       } else {
-        if (latestValue !== valueRef.current) {
-          console.log('start debounce timer');
-          timerRef.current = setTimeout(() => {
-            console.log('debounce time out');
-            setValue(latestValueRef.current)
-          }, delay);
-        }
-        return valueRef.current !== undefined ? valueRef.current : latestValue;
+        timerRef.current = setTimeout(() => {
+          setValue(newestValueRef.current)
+        }, delay);
       }
     },
     [delay],
@@ -123,5 +122,8 @@ export const useDebouncedValue = <T extends unknown>(delay: number) => {
       timerRef.current && clearTimeout(timerRef.current);
     }
   }, []);
-  return getDebouncedValue;
+  return [
+    valueRef.current,
+    submitNewValue,
+  ] as const;
 };
