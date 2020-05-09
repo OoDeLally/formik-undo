@@ -2,7 +2,7 @@ import { useFormikContext } from 'formik';
 import { pickBy, some } from 'lodash';
 import { useRef } from 'react';
 import { useFormikUndo } from './FormikUndo';
-import { useDebouncedValue, useEffectAfterFirstChange, useThrottledValue } from './hooks';
+import { useDebouncer, useEffectAfterFirstChange, useThrottler } from './hooks';
 
 
 interface AutoSaveConfig {
@@ -28,10 +28,9 @@ export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoS
   const previousValuesRef = useRef<T>(values);
   const previousModifiedFieldsRef = useRef<(keyof T)[]>([]);
   const { saveCheckpoint } = useFormikUndo();
-  // const getThrottledValue = useThrottledValue<T>(throttleDelay);
-  // const getDebouncedValue = useDebouncedValue<T>(debounceDelay);
+  const [throttledValue, submitValueToThrottler] = useThrottler<T>(values, throttleDelay);
+  const [debouncedValue, submitValueToDebouncer] = useDebouncer<T>(values, debounceDelay);
 
-  // const wereFormikValuesChanged = values !== previousValuesRef.current;
 
   // let resetTimer = false;
   // if (wereFormikValuesChanged && saveOnFieldChange) {
@@ -52,16 +51,21 @@ export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoS
   // console.log('valuesToMonitor', valuesToMonitor);
   // // const valuesToMonitor = getDebouncedValue(getThrottledValue(values, resetTimer), resetTimer);
 
-  // previousValuesRef.current = values;
 
-  // useEffectAfterFirstChange(
-  //   () => {
-  //     if (!enabled) {
-  //       return;
-  //     }
-  //     saveCheckpoint(valuesToMonitor);
-  //   },
-  //   valuesToMonitor,
-  //   [enabled],
-  // );
+  useEffectAfterFirstChange(
+    () => {
+      if (!enabled) {
+        return;
+      }
+
+
+
+      const valueToSave = previousValuesRef.current;
+      console.log('valueToSave', valueToSave);
+      saveCheckpoint(valueToSave);
+      previousValuesRef.current = values;
+    },
+    values,
+    [enabled],
+  );
 };

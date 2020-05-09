@@ -1,7 +1,7 @@
-import { createStyles, CssBaseline, makeStyles, Paper, TextField, Theme, Button, Checkbox, FormControlLabel } from '@material-ui/core';
+import { Button, Checkbox, createStyles, CssBaseline, FormControlLabel, makeStyles, Paper, TextField, Theme } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik'; // Using formik-undo's  formik module one folder up.
-import { FormikUndoContextProvider, FormikUndoControl, useFormikUndoAutoSave, useFormikUndo, useDebouncedValue, useThrottledValue } from 'formik-undo';
-import React, { useState, useEffect } from 'react';
+import { FormikUndoContextProvider, FormikUndoControl, useFormikUndo, useFormikUndoAutoSave } from 'formik-undo';
+import React, { useState } from 'react';
 import { MaterialFormikUndoControl } from './MaterialUiFormikUndoControl';
 
 
@@ -14,7 +14,7 @@ interface Article {
 
 const initialValues = {
   title: 'My New Article',
-  content: 'This is my brand new article',
+  content: '',
 };
 
 
@@ -83,7 +83,7 @@ const SaveCheckpointButton = () => {
       className={classes.manualSaveButton}
       variant="contained"
       size="small"
-      onClick={saveCheckpoint}
+      onClick={() => saveCheckpoint()}
       title="Create a checkpoint now in the undo history"
     >
       Save now
@@ -126,7 +126,7 @@ const RedoableCounter = () => {
 
 const AutoSaveControl = () => {
   const classes = useStyles();
-  const [enabled, setEnabled] = useState(true);
+  const [enabled, setEnabled] = useState(false);
   const [throttleDelay, setThrottleDelay] = useState(2000);
   const [debounceDelay, setDebounceDelay] = useState(1000);
   useFormikUndoAutoSave({ enabled, throttleDelay, debounceDelay });
@@ -208,20 +208,20 @@ const MyForm = () => {
 
 
 
-const TimerTester = () => {
-  const [value, setValue] = useState<number>(0);
-  const [timedValue, submitNewValue] = useThrottledValue<number>(value, 1000);
-  useEffect(() => {
-    submitNewValue(value);
-  }, [value, submitNewValue]);
-  return (
-    <div>
-      <Button onClick={() => setValue(val => val + 1)}>Inc</Button>
-      <TextField disabled={true} label="value" value={value}/>
-      <TextField disabled={true} label="Result" value={timedValue}/>
-    </div>
-  );
-};
+// const TimerTester = () => {
+//   const [value, setValue] = useState<number>(0);
+//   const [timedValue, submitNewValue] = useThrottledValue<number>(value, 1000);
+//   useEffect(() => {
+//     submitNewValue(value);
+//   }, [value, submitNewValue]);
+//   return (
+//     <div>
+//       <Button onClick={() => setValue(val => val + 1)}>Inc</Button>
+//       <TextField disabled={true} label="value" value={value}/>
+//       <TextField disabled={true} label="Result" value={timedValue}/>
+//     </div>
+//   );
+// };
 
 
 
@@ -236,7 +236,7 @@ const App = () => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-        <TimerTester/>
+        {/* <TimerTester/> */}
         <Formik
           initialValues={initialValues}
           onSubmit={handleSubmit}

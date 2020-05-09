@@ -53,7 +53,7 @@ export const useEffectAfterFirstChange =
 };
 
 
-export const useThrottledValue = <T extends unknown>(initialValue: T, delay: number) => {
+export const useThrottler = <T extends unknown>(initialValue: T, delay: number) => {
   const [, valueRef, setValue] = useStateAndRef<T>(initialValue);
   const newestValueRef = useRef<T>(initialValue);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -89,14 +89,11 @@ export const useThrottledValue = <T extends unknown>(initialValue: T, delay: num
       timerRef.current && clearTimeout(timerRef.current);
     }
   }, []);
-  return [
-    valueRef.current,
-    submitNewValue,
-  ] as const;
+  return [valueRef.current, submitNewValue] as const;
 };
 
 
-export const useDebouncedValue = <T extends unknown>(initialValue: T, delay: number) => {
+export const useDebouncer = <T extends unknown>(initialValue: T, delay: number) => {
   const [, valueRef, setValue] = useStateAndRef<T>(initialValue);
   const newestValueRef = useRef<T>(initialValue);
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -122,8 +119,5 @@ export const useDebouncedValue = <T extends unknown>(initialValue: T, delay: num
       timerRef.current && clearTimeout(timerRef.current);
     }
   }, []);
-  return [
-    valueRef.current,
-    submitNewValue,
-  ] as const;
+  return [valueRef.current, submitNewValue] as const;
 };

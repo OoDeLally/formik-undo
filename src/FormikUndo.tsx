@@ -1,6 +1,7 @@
-import { useFormikContext } from 'formik';
+import { useFormikContext, isObject } from 'formik';
 import React, { ReactNode, useCallback, useContext, useMemo, useRef } from 'react';
 import { useStateAndRef, useValueRef } from './hooks';
+import { isPlainObject } from 'lodash';
 
 
 interface FormikUndo<Values extends object> {
@@ -36,6 +37,8 @@ interface FormikUndoContextProviderProps {
 export const FormikUndoContextProvider = <Values extends object>({
   children
 }: FormikUndoContextProviderProps) => {
+  console.log('');
+  console.log('');
   const formikContext = useFormikContext<Values>();
   if (!formikContext) {
     throw new Error(
@@ -45,18 +48,32 @@ export const FormikUndoContextProvider = <Values extends object>({
     );
   }
   const {
-    values: formikValues, setValues: setFormikValues, initialValues: formikInitialValues
+    values: formikValues, setValues: setFormikValues
   } = formikContext;
   const formikValuesRef = useValueRef(formikValues);
-  const checkPoints = useRef<Values[]>([formikInitialValues]).current;
-  const [currentCheckpointIndex, currentCheckpointIndexRef, setCurrentCheckpointIndex] = useStateAndRef(0);
+  const checkPoints = useRef<Values[]>([formikValues]).current;
+  const currentCheckpointIndexRef = useRef(0);
   const lastValuesModifiedByUsRef = useRef<Values | undefined>();
 
-  const undoableCount = currentCheckpointIndex;
-  const redoableCount = checkPoints.length - currentCheckpointIndex - 1;
+  const currentCheckpoint = checkPoints[currentCheckpointIndexRef.current];
+  console.log('formikValues', formikValues);
+  console.log('currentCheckpointIndexRef.current', currentCheckpointIndexRef.current);
+  console.log('currentCheckpoint', currentCheckpoint);
+  const valuesChangedSinceCurrentCheckpoint = formikValues !== currentCheckpoint;
+  const undoableCount = currentCheckpointIndexRef.current + (valuesChangedSinceCurrentCheckpoint ? 1 : 0);
+  const redoableCount = valuesChangedSinceCurrentCheckpoint
+    ? 0
+    : checkPoints.length - currentCheckpointIndexRef.current - 1;
+
 
   const saveCheckpoint = useCallback(
     (values?: Values) => {
+      if (!(values === undefined || isPlainObject(values))) {
+        console.error('Expected plain object. Received', values);
+        throw new Error(`Expected plain object. Check the console.`);
+      }
+      console.log('values', values);
+      console.log('formikValuesRef.current', formikValuesRef.current);
       const valuesToSave = values || formikValuesRef.current;
       if (valuesToSave === lastValuesModifiedByUsRef.current) {
         return; // This change was created by us. Saving aborted.
@@ -65,57 +82,64 @@ export const FormikUndoContextProvider = <Values extends object>({
       if (valuesToSave === currentCheckpoint) {
         return; // The state of the form has not changed. Nothing to do.
       }
+      console.log('valuesToSave', valuesToSave);
       checkPoints.splice(
         currentCheckpointIndexRef.current + 1,
         checkPoints.length, // Remove all checkpoints after current position.
         valuesToSave,
       );
-      setCurrentCheckpointIndex(index => index + 1);
+      console.log('checkPoints', checkPoints);
+      currentCheckpointIndexRef.current++;
     },
-    [formikValuesRef, checkPoints, currentCheckpointIndexRef, setCurrentCheckpointIndex],
+    [formikValuesRef, checkPoints, currentCheckpointIndexRef],
   );
 
-  const setNewFormikValue = useCallback(
-    (newValues: Values) => {
-      lastValuesModifiedByUsRef.current = newValues;
-      setFormikValues(newValues);
+  const revertToCheckpoint = useCallback(
+    (checkpointIndex: number) => {
+      currentCheckpointIndexRef.current = checkpointIndex;
+      const checkpoint = checkPoints[checkpointIndex];
+      lastValuesModifiedByUsRef.current = checkpoint;
+      setFormikValues(checkpoint);
     },
     [setFormikValues],
   );
 
   const reset = useCallback(
     () => {
-      if (currentCheckpointIndexRef.current === 0) {
-        return; // Nothing to undo.
-      }
-      setCurrentCheckpointIndex(0);
-      setNewFormikValue(checkPoints[0]);
+      revertToCheckpoint(0);
     },
-    [setNewFormikValue, checkPoints, setCurrentCheckpointIndex, currentCheckpointIndexRef],
+    [revertToCheckpoint, checkPoints, currentCheckpointIndexRef],
   );
 
   const undo = useCallback(
     () => {
-      if (currentCheckpointIndexRef.current === 0) {
-        return; // Nothing to undo.
+      if (currentCheckpointIndexRef.current < 0) {
+        console.warn('impossible undo: out of bounds');
+        return;
       }
-      const checkpoint = checkPoints[currentCheckpointIndexRef.current - 1];
-      setNewFormikValue(checkpoint);
-      setCurrentCheckpointIndex(index => index - 1);
+      const currentCheckpoint = checkPoints[currentCheckpointIndexRef.current];
+      const valuesChangedSinceCurrentCheckpoint = formikValuesRef.current !== currentCheckpoint;
+      if (valuesChangedSinceCurrentCheckpoint) {
+        // Values have been changed by user.
+        // We just need to revert to the current checkpoint.
+        revertToCheckpoint(currentCheckpointIndexRef.current);
+      } else {
+        // Values haven't been changed. Therefore we need to go back in history.
+        revertToCheckpoint(currentCheckpointIndexRef.current - 1);
+      }
     },
-    [setNewFormikValue, checkPoints, currentCheckpointIndexRef, setCurrentCheckpointIndex],
+    [revertToCheckpoint, checkPoints, currentCheckpointIndexRef, formikValuesRef],
   );
 
   const redo = useCallback(
     () => {
       if (currentCheckpointIndexRef.current === checkPoints.length - 1) {
-        return; // Nothing to redo.
+        console.warn('impossible redo: out of bounds');
+        return;
       }
-      const checkpoint = checkPoints[currentCheckpointIndexRef.current + 1];
-      setCurrentCheckpointIndex(index => index + 1);
-      setNewFormikValue(checkpoint);
+      revertToCheckpoint(currentCheckpointIndexRef.current + 1);
     },
-    [setNewFormikValue, checkPoints, currentCheckpointIndexRef, setCurrentCheckpointIndex],
+    [revertToCheckpoint, checkPoints, currentCheckpointIndexRef],
   );
 
   const context = useMemo(
