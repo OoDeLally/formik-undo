@@ -3,8 +3,8 @@ import React, { ReactNode, useCallback, useContext, useMemo, useRef } from 'reac
 import { useStateAndRef, useValueRef } from './hooks';
 
 
-interface FormikUndo {
-  saveCheckpoint: () => void;
+interface FormikUndo<Values extends object> {
+  saveCheckpoint: (values?: Values) => void;
   reset: () => void;
   undo: () => void;
   redo: () => void;
@@ -13,10 +13,10 @@ interface FormikUndo {
 }
 
 
-const reactContext = React.createContext<FormikUndo>(null!);
+const reactContext = React.createContext<FormikUndo<any>>(null!);
 
 
-export const useFormikUndo = (): FormikUndo => {
+export const useFormikUndo = <Values extends object>(): FormikUndo<Values> => {
   const formikUndoContext = useContext(reactContext);
   if (!formikUndoContext) {
     throw new Error(
@@ -56,18 +56,19 @@ export const FormikUndoContextProvider = <Values extends object>({
   const redoableCount = checkPoints.length - currentCheckpointIndex - 1;
 
   const saveCheckpoint = useCallback(
-    () => {
-      if (formikValuesRef.current === lastValuesModifiedByUsRef.current) {
+    (values?: Values) => {
+      const valuesToSave = values || formikValuesRef.current;
+      if (valuesToSave === lastValuesModifiedByUsRef.current) {
         return; // This change was created by us. Saving aborted.
       }
       const currentCheckpoint = checkPoints[currentCheckpointIndexRef.current];
-      if (formikValuesRef.current === currentCheckpoint) {
+      if (valuesToSave === currentCheckpoint) {
         return; // The state of the form has not changed. Nothing to do.
       }
       checkPoints.splice(
         currentCheckpointIndexRef.current + 1,
         checkPoints.length, // Remove all checkpoints after current position.
-        formikValuesRef.current,
+        valuesToSave,
       );
       setCurrentCheckpointIndex(index => index + 1);
     },
