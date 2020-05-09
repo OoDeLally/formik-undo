@@ -131,10 +131,13 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
     [formikValuesRef, checkpoints, currentCheckpointIndexRef],
   );
 
-  const revertToCheckpoint = useCallback(
+  const jumpToCheckpoint = useCallback(
     (checkpointIndex: number) => {
       currentCheckpointIndexRef.current = checkpointIndex;
       const checkpoint = checkpoints[checkpointIndex];
+      if (checkpoint === undefined) {
+        throw new Error(`jumpToCheckpoint(${checkpointIndex}): out of bounds`)
+      }
       lastValuesModifiedByUsRef.current = checkpoint;
       setDebugCurrentCheckpointIndex(checkpointIndex);
       setFormikValues(checkpoint);
@@ -142,50 +145,48 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
     [setFormikValues],
   );
 
-  const undoTo = useCallback(
-    (targetCheckpointIndex: number) => {
-      if (targetCheckpointIndex < 0) {
-        console.warn(`impossible undo: targetCheckpointIndex ${targetCheckpointIndex} out of bounds`);
-        return;
-      }
+
+  const areFormikValuesEqualToCurrentCheckpoint = useCallback(
+    () => {
       const currentCheckpoint = checkpoints[currentCheckpointIndexRef.current];
-      const valuesChangedSinceTargetCheckpoint = !areFormikValuesEqual(formikValuesRef.current, currentCheckpoint);
-      if (valuesChangedSinceTargetCheckpoint) {
-        // Values have been changed by user.
-        checkpoints.push(formikValuesRef.current); // save the current value (in case we need to redo later).
-        setDebugCheckpoints([...checkpoints]);
-        revertToCheckpoint(targetCheckpointIndex); // And revert to the current checkpoint.
-      } else {
-        // Values haven't been changed since current checkpoint. Therefore we need to go back in history.
-        revertToCheckpoint(targetCheckpointIndex);
-      }
+      return areFormikValuesEqual(formikValuesRef.current, currentCheckpoint);
     },
-    [revertToCheckpoint, checkpoints, formikValuesRef],
+    [checkpoints],
   );
+
 
   const reset = useCallback(
     () => {
-      undoTo(0);
+      if (!areFormikValuesEqualToCurrentCheckpoint()) {
+        // Values have been changed by user.
+        checkpoints.push(formikValuesRef.current); // save the current value (since we may redo later).
+        setDebugCheckpoints([...checkpoints]);
+      }
+      jumpToCheckpoint(0);
     },
-    [undoTo],
+    [jumpToCheckpoint, checkpoints, formikValuesRef],
   );
 
-  const undoOnce = useCallback(
+  const undo = useCallback(
     () => {
-      undoTo(currentCheckpointIndexRef.current - 1);
+      if (areFormikValuesEqualToCurrentCheckpoint()) {
+        // Values haven't been changed since current checkpoint. Therefore we need to go back in history.
+        jumpToCheckpoint(currentCheckpointIndexRef.current - 1);
+      } else {
+        // Values have been changed by user.
+        checkpoints.push(formikValuesRef.current); // save the current value (in case we need to redo later).
+        setDebugCheckpoints([...checkpoints]);
+        jumpToCheckpoint(currentCheckpointIndexRef.current);
+      }
     },
-    [undoTo, currentCheckpointIndexRef],
+    [jumpToCheckpoint, checkpoints, formikValuesRef],
   );
 
   const redo = useCallback(
     () => {
-      if (currentCheckpointIndexRef.current === checkpoints.length - 1) {
-        console.warn(`impossible redo: targetCheckpointIndex ${currentCheckpointIndexRef.current} out of bounds`);
-        return;
-      }
-      revertToCheckpoint(currentCheckpointIndexRef.current + 1);
+      jumpToCheckpoint(currentCheckpointIndexRef.current + 1);
     },
-    [revertToCheckpoint, checkpoints, currentCheckpointIndexRef],
+    [jumpToCheckpoint, checkpoints, currentCheckpointIndexRef],
   );
 
 
@@ -199,8 +200,8 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
   }, [mutatedCheckpointsIfChanged]);
 
   const context = useMemo(
-    () => ({ saveCheckpoint, undo: undoOnce, reset, redo, undoableCount, redoableCount, checkpoints: debugCheckpoints, currentCheckpointIndex: debugCurrentCheckpointIndex }),
-    [saveCheckpoint, undoOnce, reset, redo, undoableCount, redoableCount, debugCheckpoints, debugCurrentCheckpointIndex ]
+    () => ({ saveCheckpoint, undo, reset, redo, undoableCount, redoableCount, checkpoints: debugCheckpoints, currentCheckpointIndex: debugCurrentCheckpointIndex }),
+    [saveCheckpoint, undo, reset, redo, undoableCount, redoableCount, debugCheckpoints, debugCurrentCheckpointIndex ]
   );
 
   return (
