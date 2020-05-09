@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/OoDeLally/formik-undo#readme",
   "dependencies": {
-    "formik": "^2.1.4",
-    "react": "^16.9.0"
+    "formik": "^2.1.0",
+    "react": "^16.8.0"
   },
   "devDependencies": {
     "@types/jest": "^25.1.4",
