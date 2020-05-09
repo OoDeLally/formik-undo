@@ -50,15 +50,15 @@ const MyComponent = () => {
 };
 ```
 
-| Name                       | Type         | Description                                                   |
-| ---------------------------|--------------|---------------------------------------------------------------|
-| `reset`                    | `() => void` | Reset the form to the initial values.                         |
-| `undo`                     | `() => void` | Undo to previous checkpoint.                                  |
-| `redo`                     | `() => void` | Redo to next checkpoint.                                      |
-| `saveCheckpoint`           | `() => void` | Save a checkpoint to the history.                             |
-| `undoableCount`            | `number`     | Number of possible undo actions.                              |
-| `redoableCount`            | `number`     | Number of possible redo actions.                              |
-| `didCreateCurrentValues`   | `boolean`    | Wether the latest form's values were set by us (advanced).    |
+| Name                       | Type         | Description                                                    |
+| ---------------------------|--------------|----------------------------------------------------------------|
+| `reset`                    | `() => void` | Reset the form to the initial values.                          |
+| `undo`                     | `() => void` | Undo to previous checkpoint.                                   |
+| `redo`                     | `() => void` | Redo to next checkpoint.                                       |
+| `saveCheckpoint`           | `() => void` | Save a checkpoint to the history.                              |
+| `undoableCount`            | `number`     | Number of possible undo actions.                               |
+| `redoableCount`            | `number`     | Number of possible redo actions.                               |
+| `didCreateCurrentValues`   | `boolean`    | Whether the latest form's values were set by us (advanced).    |
 
 
 
