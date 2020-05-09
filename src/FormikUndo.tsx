@@ -6,20 +6,21 @@ import { useValueRef } from './hooks';
 type FormikValues = Record<any, any>;
 
 
-interface FormikUndo<Values extends FormikValues> {
+interface FormikUndoContext<Values extends FormikValues> {
   saveCheckpoint: (values?: Values) => void;
   reset: () => void;
   undo: () => void;
   redo: () => void;
   undoableCount: number;
   redoableCount: number;
+  didCreateCurrentValues: boolean;
 }
 
 
-const reactContext = React.createContext<FormikUndo<any>>(null!);
+const reactContext = React.createContext<FormikUndoContext<any>>(null!);
 
 
-export const useFormikUndo = <Values extends FormikValues>(): FormikUndo<Values> => {
+export const useFormikUndo = <Values extends FormikValues>(): FormikUndoContext<Values> => {
   const formikUndoContext = useContext(reactContext);
   if (!formikUndoContext) {
     throw new Error(
@@ -90,7 +91,7 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
   const redoableCount = valuesChangedSinceCurrentCheckpoint
     ? 0
     : checkpoints.length - currentCheckpointIndexRef.current - 1;
-
+  const didCreateCurrentValues = areFormikValuesEqual(formikValues, lastValuesModifiedByUsRef.current);
 
   const saveCheckpoint = useCallback(
     (values?: Values) => {
@@ -124,7 +125,6 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
     },
     [setFormikValues, checkpoints],
   );
-
 
   const areFormikValuesEqualToCurrentCheckpoint = useCallback(
     () => {
@@ -167,10 +167,9 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
     [jumpToCheckpoint, currentCheckpointIndexRef],
   );
 
-
   const context = useMemo(
-    () => ({ saveCheckpoint, undo, reset, redo, undoableCount, redoableCount }),
-    [saveCheckpoint, undo, reset, redo, undoableCount, redoableCount],
+    () => ({ saveCheckpoint, undo, reset, redo, undoableCount, redoableCount, didCreateCurrentValues }),
+    [saveCheckpoint, undo, reset, redo, undoableCount, redoableCount, didCreateCurrentValues],
   );
 
   return (

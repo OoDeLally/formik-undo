@@ -54,71 +54,40 @@ export const useEffectAfterFirstChange =
 };
 
 
-export const useThrottler = <T extends unknown>(initialValue: T, delay: number) => {
-  const [, valueRef, setValue] = useStateAndRef<T>(initialValue);
-  const newestValueRef = useRef<T>(initialValue);
+export const useThrottler = <T extends unknown>(intialValue: T, delay: number) => {
+  const [value, valueRef, setValue] = useStateAndRef<T>(intialValue);
+  const newestValueGetterRef = useRef<() => T>();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const restartTimer = useCallback(
     () => {
       timerRef.current = setTimeout(() => {
-        if (newestValueRef.current !== valueRef.current) {
+        const newValue = newestValueGetterRef.current!();
+        if (newValue !== valueRef.current) {
           restartTimer();
-          setValue(newestValueRef.current);
+          setValue(newValue);
         } else {
+          // Stop throttling.
           timerRef.current = null;
         }
       }, delay);
     },
-    [delay, setValue, timerRef, valueRef],
+    [delay, valueRef, setValue],
   );
   const submitNewValue = useCallback(
-    (newValue: T, resetTimer?: boolean) => {
-      if (newValue === valueRef.current) {
-        return;
-      }
-      newestValueRef.current = newValue;
+    (getValue: () => T, resetTimer?: boolean) => {
+      newestValueGetterRef.current = getValue;
       if (delay === 0 || resetTimer || timerRef.current === null) {
         restartTimer();
-        setValue(newValue);
+        setValue(getValue());
       }
     },
-    [delay, setValue, timerRef, valueRef, restartTimer],
+    [delay, restartTimer, setValue],
   );
   useEffect(() => {
     return () => {
       timerRef.current && clearTimeout(timerRef.current);
     };
   }, []);
-  return [valueRef.current, submitNewValue] as const;
-};
-
-
-export const useDebouncer = <T extends unknown>(initialValue: T, delay: number) => {
-  const [, valueRef, setValue] = useStateAndRef<T>(initialValue);
-  const newestValueRef = useRef<T>(initialValue);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
-  const submitNewValue = useCallback(
-    (newValue: T, resetTimer?: boolean) => {
-      if (newValue === valueRef.current) {
-        return;
-      }
-      newestValueRef.current = newValue;
-      timerRef.current && clearTimeout(timerRef.current);
-      if (delay === 0 || resetTimer) {
-        setValue(newValue);
-      } else {
-        timerRef.current = setTimeout(() => {
-          setValue(newestValueRef.current);
-        }, delay);
-      }
-    },
-    [delay, setValue, timerRef, valueRef],
-  );
-  useEffect(() => {
-    return () => {
-      timerRef.current && clearTimeout(timerRef.current);
-    };
-  }, []);
-  return [valueRef.current, submitNewValue] as const;
+  return [value, submitNewValue] as const;
 };

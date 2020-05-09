@@ -130,8 +130,7 @@ const AutoSaveControl = () => {
   const classes = useStyles();
   const [enabled, setEnabled] = useState(true);
   const [throttleDelay, setThrottleDelay] = useState(2000);
-  const [debounceDelay, setDebounceDelay] = useState(1000);
-  useFormikUndoAutoSave({ enabled, throttleDelay, debounceDelay, saveOnFieldChange: false });
+  useFormikUndoAutoSave({ enabled, throttleDelay, saveOnFieldChange: false });
   return (
     <div className={classes.autoSaveControl}>
       <FormControlLabel
@@ -151,17 +150,6 @@ const AutoSaveControl = () => {
           (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setThrottleDelay(+e.target.value)
         }
       />
-      <TextField
-        className={classes.autoSaveControlField}
-        disabled={!enabled}
-        type="number"
-        label="Debounce"
-        size="small"
-        value={debounceDelay}
-        onChange={
-          (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => setDebounceDelay(+e.target.value)
-        }
-      />
     </div>
   );
 };
@@ -170,7 +158,7 @@ const AutoSaveControl = () => {
 const Sidebar = () => {
   return (
     <>
-      {/* <SaveCheckpointButton /> */}
+      <SaveCheckpointButton />
       <UndoableCounter/>
       <RedoableCounter/>
       <AutoSaveControl />
