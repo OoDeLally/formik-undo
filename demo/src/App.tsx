@@ -1,6 +1,6 @@
-import { Button, Checkbox, createStyles, CssBaseline, FormControlLabel, makeStyles, Paper, TextField, Theme, Divider, List, ListItem } from '@material-ui/core';
+import { Button, Checkbox, createStyles, CssBaseline, Divider, FormControlLabel, List, ListItem, makeStyles, Paper, TextField, Theme } from '@material-ui/core';
 import { Field, Form, Formik } from 'formik'; // Using formik-undo's  formik module one folder up.
-import { FormikUndoContextProvider, FormikUndoControl, useFormikUndo, useFormikUndoAutoSave } from 'formik-undo';
+import { FormikUndoContextProvider, useFormikUndo, useFormikUndoAutoSave } from 'formik-undo';
 import React, { useState } from 'react';
 import { MaterialFormikUndoControl } from './MaterialUiFormikUndoControl';
 
@@ -59,7 +59,6 @@ export const useStyles = makeStyles((theme: Theme) =>
     undoControlBar: {
       display: 'flex',
       alignItems: 'center',
-      marginBottom: theme.spacing(4),
     },
     undoControlBarTitle: {
       display: 'block',
@@ -70,10 +69,12 @@ export const useStyles = makeStyles((theme: Theme) =>
     },
     titleField: {
       display: 'block',
+      width: '23em',
     },
     contentField: {
       display: 'block',
       marginTop: theme.spacing(4),
+      width: '23em',
     },
   }),
 );
@@ -133,7 +134,7 @@ const RedoableCounter = () => {
 const AutoSaveControl = () => {
   const classes = useStyles();
   const [enabled, setEnabled] = useState(true);
-  const [throttleDelay, setThrottleDelay] = useState(2000);
+  const [throttleDelay, setThrottleDelay] = useState(1000);
   const [saveOnFieldChange, setSaveOnFieldChange] = useState(true);
   useFormikUndoAutoSave({ enabled, throttleDelay, saveOnFieldChange });
   return (
@@ -192,23 +193,22 @@ const MyForm = () => {
     <Form>
       <div className={classes.undoControlBar}>
         <MaterialFormikUndoControl />
-        <div>(or Vanilla elements</div>
-        <FormikUndoControl className={classes.vanillaControlBar} />
-        <div>)</div>
       </div>
       <Field
         as={TextField}
         className={classes.titleField}
+        fullWidth
         label="Title"
         name="title"
       />
       <Field
         as={TextField}
         className={classes.contentField}
+        fullWidth
         name="content"
         label="Content"
         variant="outlined" multiline
-        rows={10}
+        rows={3}
       />
     </Form>
   )
