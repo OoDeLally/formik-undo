@@ -24,7 +24,7 @@ export const useFormikUndo = <Values extends FormikValues>(): FormikUndoContext<
   if (!formikUndoContext) {
     throw new Error(
       'FormikUndo context not found. ' +
-      'Make sure you call useFormikUndoAutoSave() is inside a FormikUndo context.'
+      'Make sure you call useFormikUndo() inside a FormikUndo context.'
     );
   }
   return formikUndoContext;
