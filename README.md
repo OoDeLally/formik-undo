@@ -8,6 +8,8 @@ Uses Typescript and React hooks.
 ![screenshot](https://github.com/OoDeLally/formik-undo/blob/master/demo/formik-undo.gif)
 
 
+Online Demo: https://codesandbox.io/s/github/OoDeLally/formik-undo-demo
+
 
 ## Setup
 
@@ -133,20 +135,6 @@ const MyForm = () => {
 
 If you use `Material-UI`, you can use a wrapper that prettifies the `FormikUndoControl`:
 
-https://github.com/OoDeLally/formik-undo/blob/master/demo/src/MaterialUiFormikUndoControl.tsx
+https://github.com/OoDeLally/formik-undo/blob/master/helpers/MaterialUiFormikUndoControl.tsx
 
 (Add the file into your project).
-
-
-
-
-# Run the demo
-
-```bash
-
-git clone https://github.com/OoDeLally/formik-undo.git
-cd formik-undo
-npm install
-npm run demo-install
-npm run demo
-```
