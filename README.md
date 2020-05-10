@@ -5,7 +5,7 @@ Provide the ability to undo / redo modifications in a Formik form.
 Uses Typescript and React hooks.
 
 
-![screenshot](https://github.com/OoDeLally/formik-undo/blob/master/demo/formik-undo.gif)
+![screenshot](https://github.com/OoDeLally/formik-undo/blob/master/extras/formik-undo.gif)
 
 
 Online Demo: https://codesandbox.io/s/github/OoDeLally/formik-undo-demo

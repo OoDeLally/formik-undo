@@ -2,13 +2,13 @@
   "name": "formik-undo",
   "version": "1.0.6",
   "description": "Provide the ability to undo / redo modifications in a Formik form.",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
+  "main": "dist/formik-undo.js",
+  "module": "dist/formik-undo.es.js",
   "files": [
     "dist"
   ],
-  "browser": "dist/index.browser.js",
-  "types": "dist/index.d.ts",
+  "browser": "dist/formik-undo.browser.js",
+  "types": "dist/formik-undo.d.ts",
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -cw",
