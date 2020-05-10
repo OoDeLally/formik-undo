@@ -1,6 +1,6 @@
 {
   "name": "formik-undo",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Provide the ability to undo / redo modifications in a Formik form.",
   "main": "dist/formik-undo.js",
   "module": "dist/formik-undo.es.js",
