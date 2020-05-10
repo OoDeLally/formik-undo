@@ -135,6 +135,6 @@ const MyForm = () => {
 
 If you use `Material-UI`, you can use a wrapper that prettifies the `FormikUndoControl`:
 
-https://github.com/OoDeLally/formik-undo/blob/master/helpers/MaterialUiFormikUndoControl.tsx
+https://github.com/OoDeLally/formik-undo/blob/master/extras/MaterialUiFormikUndoControl.tsx
 
 (Add the file into your project).
