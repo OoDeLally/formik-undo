@@ -71,6 +71,7 @@ module.exports = {
     'variable-name': 'off',
   },
   ignorePatterns: [
-    '**/node_modules/*'
+    '**/node_modules/*',
+    'dist',
   ]
 };
