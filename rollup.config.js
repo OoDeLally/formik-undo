@@ -12,11 +12,11 @@ export default {
       file: pkg.module,
       format: 'es' // the preferred format
     },
-    // {
-    //   file: pkg.browser,
-    //   format: 'iife',
-    //   name: 'FormikUndo' // the global which can be used in a browser
-    // }
+    {
+      file: pkg.browser,
+      format: 'umd',
+      name: pkg.name,
+    }
   ],
   external: [
     ...Object.keys(pkg.dependencies || {}),
