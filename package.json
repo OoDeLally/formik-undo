@@ -12,7 +12,6 @@
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -cw",
-    "preversion": "npm run build",
     "lint": "eslint src/**/*",
     "prepare": "npm run build",
     "demo-install": "(cd ./demo && npm install)",
