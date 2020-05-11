@@ -48,10 +48,7 @@ Provider's props are as follow:
 | `autoSave.saveOnFieldChange` | `boolean`                      | `true`  | If ``true``, save a checkpoint everytime the modified field is different from the previously modified. This is useful to save the final value of a input after the user moves to another input.<br>If `false`, only the whole formik `values` object is considered and different fields changes may be aggregated from one checkpoint to another. |
 | `autoSave.preventWordCutting`| `boolean`                      | `true`  | If ``true``, when editing a string value, don't save in the middle of a word (experimental).  |
 
-
-AutoSave does _not_ take in account the semantic of the data (PRs are welcome!).
-
-If you need a finer save trigger, disable `autoSave` and write your own hook using the methods provided by `useFormikContext()` and `useFormikUndo()`.
+If you need a finer save trigger, write your own hook using the methods provided by `useFormikContext()` and `useFormikUndo()`.
 
 
 
