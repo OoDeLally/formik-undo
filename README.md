@@ -43,12 +43,14 @@ Provider's props are as follow:
 
 | Name                         | Type                           | Default | Description                                                                    |
 | -----------------------------|--------------------------------|---------|--------------------------------------------------------------------------------|
-| `autoSave`                   | `boolean`  \| `{ ...options }` | `true`  | If `false`, does not autosave<br>If `true`, autosave with the default options<br>If `object` autosave with the provided options. |
+| `autoSave`                   | `boolean  \| { ...options }`   | `true`  | If `false`, does not autosave.<br>If `true`, autosave with the default options.<br>If `object` autosave with the provided options. |
 | `autoSave.throttleDelay`     | `number`                       | 2000    | Frequency of autosaving in millisecond.<br>If `0`, save at every modification. |
 | `autoSave.saveOnFieldChange` | `boolean`                      | `true`  | If ``true``, save a checkpoint everytime the modified field is different from the previously modified. This is useful to save the final value of a input after the user moves to another input.<br>If `false`, only the whole formik `values` object is considered and different fields changes may be aggregated from one checkpoint to another. |
 
 
-Autosave does _not_ take in account the semantic of the data (PRs are welcome!).
+AutoSave does _not_ take in account the semantic of the data (PRs are welcome!).
+
+If you need a finer save trigger, disable `autoSave` and write your own hook using the methods provided by `useFormikContext()` and `useFormikUndo()`.
 
 
 
@@ -73,7 +75,7 @@ const MyComponent = () => {
 | `reset`                      | `() => void`                  | Reset the form to the initial values.                          |
 | `undo`                       | `() => void`                  | Undo to previous checkpoint.                                   |
 | `redo`                       | `() => void`                  | Redo to next checkpoint.                                       |
-| `saveCheckpoint`             | `() => void`                  | Save a checkpoint to the history.                              |
+| `saveCheckpoint`             | `() => void`                  | Manually save a checkpoint to the history.                     |
 | `undoableCount`              | `number`                      | Number of possible undo actions.                               |
 | `redoableCount`              | `number`                      | Number of possible redo actions.                               |
 | `didCreateCurrentValues`     | `boolean`                     | Whether the latest form's values were set by us (advanced).    |
