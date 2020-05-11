@@ -16,6 +16,9 @@ export default {
       file: pkg.browser,
       format: 'umd',
       name: pkg.name,
+      plugins: [
+        terser(),
+      ]
     }
   ],
   external: [
@@ -26,6 +29,5 @@ export default {
     typescript({
       typescript: require('typescript'),
     }),
-    terser() // minifies generated bundles
   ]
 };
