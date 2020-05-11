@@ -21,19 +21,35 @@ npm install --save formik-undo
 ```tsx
 import { FormikUndoContextProvider } from 'formik-undo';
 
+const autoSaveOptions = {
+  throttleDelay: 10000,
+};
+
 const App = () => {
   return (
     <Formik
       initialValues={initialValues}
       onSubmit={handleSubmit}
     >
-      <FormikUndoContextProvider>
+      <FormikUndoContextProvider autoSave={autoSaveOptions}>
         <MyForm />
       </FormikUndoContextProvider>
     </Formik>
   );
 };
 ```
+
+Provider's props are as follow:
+
+| Name                         | Type                           | Default | Description                                                                    |
+| -----------------------------|--------------------------------|---------|--------------------------------------------------------------------------------|
+| `autoSave`                   | `boolean`  \| `{ ...options }` | `true`  | If `false`, does not autosave<br>If `true`, autosave with the default options<br>If `object` autosave with the provided options. |
+| `autoSave.throttleDelay`     | `number`                       | 2000    | Frequency of autosaving in millisecond.<br>If `0`, save at every modification. |
+| `autoSave.saveOnFieldChange` | `boolean`                      | `true`  | If ``true``, save a checkpoint everytime the modified field is different from the previously modified. This is useful to save the final value of a input after the user moves to another input.<br>If `false`, only the whole formik `values` object is considered and different fields changes may be aggregated from one checkpoint to another. |
+
+
+Autosave does _not_ take in account the semantic of the data (PRs are welcome!).
+
 
 
 ## Usage
@@ -52,53 +68,19 @@ const MyComponent = () => {
 };
 ```
 
-| Name                       | Type         | Description                                                    |
-| ---------------------------|--------------|----------------------------------------------------------------|
-| `reset`                    | `() => void` | Reset the form to the initial values.                          |
-| `undo`                     | `() => void` | Undo to previous checkpoint.                                   |
-| `redo`                     | `() => void` | Redo to next checkpoint.                                       |
-| `saveCheckpoint`           | `() => void` | Save a checkpoint to the history.                              |
-| `undoableCount`            | `number`     | Number of possible undo actions.                               |
-| `redoableCount`            | `number`     | Number of possible redo actions.                               |
-| `didCreateCurrentValues`   | `boolean`    | Whether the latest form's values were set by us (advanced).    |
+| Name                         | Type                          | Description                                                    |
+| ---------------------------  |-------------------------------|----------------------------------------------------------------|
+| `reset`                      | `() => void`                  | Reset the form to the initial values.                          |
+| `undo`                       | `() => void`                  | Undo to previous checkpoint.                                   |
+| `redo`                       | `() => void`                  | Redo to next checkpoint.                                       |
+| `saveCheckpoint`             | `() => void`                  | Save a checkpoint to the history.                              |
+| `undoableCount`              | `number`                      | Number of possible undo actions.                               |
+| `redoableCount`              | `number`                      | Number of possible redo actions.                               |
+| `didCreateCurrentValues`     | `boolean`                     | Whether the latest form's values were set by us (advanced).    |
 
 
 
-## AutoSave
-
-By default, `formik-undo` does *not* save automatically. Since forms come in all shapes, it is your responsibility to decide when to save, by using the `saveCheckpoint()` function at appropriate times.
-
-However for convenience a `useFormikUndoAutoSave()` hook is provided and will do an ok-job. It does _not_ take in account the semantic of the data (PRs are welcome!).
-
-
-```tsx
-import { useFormikUndoAutoSave } from 'formik-undo';
-
-const autoSaveOptions = {
-  throttleDelay: 10000,
-};
-
-const MyForm = () => {
-  useFormikUndoAutoSave(autoSaveOptions);
-  return (
-    <Form>
-      ...
-    </Form>
-  )
-};
-```
-
-`useFormikUndoAutoSave(options)` options are the following:
-
-| Name                 | Type       | Default | Description                                                                    |
-| ---------------------|------------|---------|--------------------------------------------------------------------------------|
-| `enabled`            | `boolean`  | `true`  | If false, this hook does nothing.                                              |
-| `throttleDelay`      | `number`   | 2000    | Frequency of autosaving in millisecond.<br>If `0`, save at every modification. |
-| `saveOnFieldChange`  | `boolean`  | `true`  | If ``true``, save a checkpoint everytime the modified field is different from the previously modified. This is useful to save the final value of a input after the user moves to another input.<br>If `false`, only the whole formik `values` object is considered and different fields changes may be aggregated from one checkpoint to another. |
-
-
-
-## Undo Control buttons
+## Control bar
 
 A control bar with default buttons is provided (as seen on the screenshot above).
 
