@@ -87,12 +87,12 @@ const MyComponent = () => {
 A control bar with default buttons is provided (as seen on the screenshot above).
 
 ```tsx
-import { FormikUndoControl } from 'formik-undo';
+import { FormikUndoControlBar } from 'formik-undo';
 
 const MyForm = () => {
   return (
     <Form>
-      <FormikUndoControl />
+      <FormikUndoControlBar />
       <input name="foo" />
       <input name="bar" />
     </Form>
@@ -100,7 +100,7 @@ const MyForm = () => {
 };
 ```
 
-`<FormikUndoControl>` accepts props:
+`<FormikUndoControlBar>` accepts props:
 
 | Name                       | Type                                                    | Default                       | Description                                   |
 | ---------------------------|---------------------------------------------------------|-------------------------------|-----------------------------------------------|
@@ -117,8 +117,8 @@ const MyForm = () => {
 
 `formik-undo` has minimal dependencies.
 
-If you use `Material-UI`, you can use a wrapper that prettifies the `FormikUndoControl`:
+If you use `Material-UI`, you can use a wrapper that prettifies the `FormikUndoControlBar`:
 
-https://github.com/OoDeLally/formik-undo/blob/master/extras/MaterialUiFormikUndoControl.tsx
+https://github.com/OoDeLally/formik-undo/blob/master/extras/MaterialUiFormikUndoControlBar.tsx
 
 (Add the file into your project).

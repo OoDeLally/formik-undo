@@ -6,7 +6,7 @@ import { useFormikUndo } from './FormikUndoProvider';
 type ButtonKind = 'reset' | 'undo' | 'redo';
 
 
-export interface FormikUndoControlProps {
+export interface FormikUndoControlBarProps {
   showReset?: boolean;
   showRedo?: boolean;
   disabled?: boolean;
@@ -43,9 +43,9 @@ const rootStyle = {
 };
 
 
-export const FormikUndoControl = ({
+export const FormikUndoControlBar = ({
   disabled, showReset, showRedo, buttonTitles, buttonClasses, className, buttonIcons, buttonComponent
-}: FormikUndoControlProps) => {
+}: FormikUndoControlBarProps) => {
 
   const { reset, undo, redo, undoableCount, redoableCount } = useFormikUndo();
 

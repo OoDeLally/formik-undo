@@ -1,6 +1,6 @@
 export { useFormikUndo } from './FormikUndoProvider';
 export { FormikUndo } from './FormikUndo';
-export { FormikUndoControl } from './FormikUndoControl';
+export { FormikUndoControlBar } from './FormikUndoControlBar';
 
-export type { FormikUndoControlProps } from './FormikUndoControl';
+export type { FormikUndoControlBarProps } from './FormikUndoControlBar';
 export type { AutoSaveOptions } from './types';
