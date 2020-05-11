@@ -79,7 +79,7 @@ export const useFormikUndoAutoSave = <T extends FormikValues>(options: Partial<A
 
       // We do not want to save the same value several times.
       // Therefore we need to only keep one request per formik value.
-      // We store all requets in a map, and the winner per-value will be selected later.
+      // We store all requests in a map, and the winner per-value will be selected later.
       const allRequestsMap = new Map<T, SaveRequest<T>[]>();
       allRequestsMap.set(previousFormikValues, []);
       allRequestsMap.set(newFormikValues, []);
