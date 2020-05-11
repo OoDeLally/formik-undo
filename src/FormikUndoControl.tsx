@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 import React from 'react';
-import { useFormikUndo } from './FormikUndo';
+import { useFormikUndo } from './FormikUndoProvider';
 
 
 type ButtonKind = 'reset' | 'undo' | 'redo';
