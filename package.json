@@ -10,7 +10,8 @@
   "browser": "dist/formik-undo.browser.js",
   "types": "dist/formik-undo.d.ts",
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && npm run bundle-types",
+    "bundle-types": "npm-dts --force -L info generate && mv index.d.ts dist/formik-undo.d.ts",
     "watch": "rollup -cw",
     "lint": "eslint src/**/*",
     "prepare": "npm run build"
@@ -27,9 +28,11 @@
   "homepage": "https://github.com/OoDeLally/formik-undo#readme",
   "dependencies": {
     "formik": "^2.1.0",
-    "react": "^16.8.0"
+    "react": "^16.8.0",
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
+    "npm-dts": "^1.2.1",
     "rollup": "^2.9.0",
     "rollup-plugin-terser": "^5.3.0",
     "rollup-plugin-typescript2": "^0.27.0",
