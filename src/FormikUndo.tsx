@@ -1,6 +1,7 @@
 import { useFormikContext } from 'formik';
 import React, { ReactNode, useCallback, useContext, useMemo, useRef } from 'react';
 import { useValueRef } from './hooks';
+import { AutoSaveOptions, useFormikUndoAutoSave } from './useFormikUndoAutoSave';
 
 type FormikValues = Record<any, any>;
 
@@ -55,13 +56,29 @@ export const areFormikValuesEqual = <Values extends FormikValues>(a: Values | un
 };
 
 
+const AutoSave = ({ options, children }: { options?: FormikUndoContextProviderProps['autoSave'], children: ReactNode }) => {
+  const usedOptions = useMemo(
+    () => options === true
+    ? undefined // Use default options
+    : options === false
+      ? { enabled: false }
+      : options,
+    [options],
+  );
+  useFormikUndoAutoSave(usedOptions);
+  return <>{children}</>;
+};
+
+
+
 interface FormikUndoContextProviderProps {
+  autoSave?: boolean | AutoSaveOptions;
   children?: ReactNode;
 }
 
 
 export const FormikUndoContextProvider = <Values extends FormikValues>({
-  children
+  autoSave: autoSaveOptions, children
 }: FormikUndoContextProviderProps) => {
   const formikContext = useFormikContext<Values>();
   if (!formikContext) {
@@ -169,7 +186,9 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
 
   return (
     <reactContext.Provider value={context}>
-      {children}
+      <AutoSave options={autoSaveOptions}>
+        {children}
+      </AutoSave>
     </reactContext.Provider>
   );
 };

@@ -4,15 +4,14 @@ import { areFormikValuesEqual, useFormikUndo } from './FormikUndo';
 import { useEffectAfterFirstChange, useThrottler, useValueRef } from './hooks';
 
 
-interface AutoSaveConfig {
+export interface AutoSaveOptions {
   throttleDelay: number;
   enabled: boolean;
   saveOnFieldChange: boolean;
 }
 
-type AutoSaveOptions = Partial<AutoSaveConfig>;
 
-const defaultOptions: AutoSaveConfig = {
+const defaultOptions: AutoSaveOptions = {
   throttleDelay: 2000,
   enabled: true,
   saveOnFieldChange: true,
@@ -41,7 +40,7 @@ const getModifiedFieldsKeys = <T extends Record<any, unknown>>(arrayA: T, arrayB
 };
 
 
-export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: AutoSaveOptions = {}) => {
+export const useFormikUndoAutoSave = <T extends Record<any, any>>(options: Partial<AutoSaveOptions> = {}) => {
   const { throttleDelay, enabled, saveOnFieldChange } = { ...defaultOptions, ...options };
   const { values } = useFormikContext<T>();
   const previousValuesRef = useRef<T>(values);
