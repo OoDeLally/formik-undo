@@ -46,7 +46,7 @@ Provider's props are as follow:
 | `autoSave`                   | `boolean  \| { ...options }`   | `true`  | If `false`, does not autosave.<br>If `true`, autosave with the default options.<br>If `object` autosave with the provided options. |
 | `autoSave.throttleDelay`     | `number`                       | 2000    | Frequency of autosaving in millisecond.<br>If `0`, save at every modification. |
 | `autoSave.saveOnFieldChange` | `boolean`                      | `true`  | If ``true``, save a checkpoint everytime the modified field is different from the previously modified. This is useful to save the final value of a input after the user moves to another input.<br>If `false`, only the whole formik `values` object is considered and different fields changes may be aggregated from one checkpoint to another. |
-| `autoSave.preventWordCutting`| `boolean`                      | `true`  | If ``true``, when editing a string value, don't save in the middle a a word (experimental).  |
+| `autoSave.preventWordCutting`| `boolean`                      | `true`  | If ``true``, when editing a string value, don't save in the middle of a word (experimental).  |
 
 
 AutoSave does _not_ take in account the semantic of the data (PRs are welcome!).
