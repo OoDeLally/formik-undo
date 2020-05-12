@@ -6,6 +6,7 @@ import { areFormikValuesEqual, useFormikUndo } from './FormikUndoProvider';
 import { useEffectAfterFirstChange, useThrottler, useValueRef } from './hooks';
 import { WordEditingCheckpointPicker } from './WordEditingCheckpointPicker';
 import { AutoSaveOptions } from './types';
+import { getFormikValuesDiff, FormikValuesDiff } from './getFormikValuesDiff';
 
 
 
@@ -27,7 +28,7 @@ export const useFormikUndoAutoSave = <T extends FormikValues>(options: Partial<A
   const { throttleDelay, enabled, saveOnFieldChange, preventWordCutting } = { ...defaultOptions, ...options };
   const { values: newFormikValues } = useFormikContext<T>();
   const previousFormikValuesRef = useRef<T>(newFormikValues);
-  const previouslyModifiedFieldsRef = useRef<(keyof T)[]>([]);
+  const previousValuesDiffRef = useRef<FormikValuesDiff>({});
   const { saveCheckpoint, addCheckpointEquivalent, didCreateCurrentValues } = useFormikUndo();
   const didCreateCurrentValuesRef = useValueRef(didCreateCurrentValues);
   const [throttledValue, submitValueToThrottler] = useThrottler<T>(newFormikValues, throttleDelay);
@@ -66,16 +67,18 @@ export const useFormikUndoAutoSave = <T extends FormikValues>(options: Partial<A
       }
 
       const previousFormikValues = previousFormikValuesRef.current;
-      const previouslyModifiedFields = previouslyModifiedFieldsRef.current;
-
-      if (areFormikValuesEqual(newFormikValues, previousFormikValues)) {
-        return; // Nothing actually changed, even though the containing object may be different.
-      }
+      const previousValuesDiff = previousValuesDiffRef.current;
 
       previousFormikValuesRef.current = newFormikValues;
 
-      const modifiedFieldsKeys = getModifiedFieldsKeys(previousFormikValues, newFormikValues);
-      previouslyModifiedFieldsRef.current = modifiedFieldsKeys;
+      const valuesDiff = getFormikValuesDiff(previousFormikValues, newFormikValues);
+      // console.log('valuesDiff', JSON.stringify(valuesDiff));
+
+      if (Object.keys(valuesDiff).length === 0) {
+        return; // Nothing actually changed, even though the containing object may be different.
+      }
+
+      previousValuesDiffRef.current = valuesDiff;
 
       // We do not want to save the same value several times.
       // Therefore we need to only keep one request per formik value.
@@ -84,7 +87,7 @@ export const useFormikUndoAutoSave = <T extends FormikValues>(options: Partial<A
       allRequestsMap.set(previousFormikValues, []);
       allRequestsMap.set(newFormikValues, []);
       for (const picker of checkpointPickers) {
-        const request = picker.pick(previousFormikValues, previouslyModifiedFields, newFormikValues, modifiedFieldsKeys);
+        const request = picker.pick(previousFormikValues, previousValuesDiff, newFormikValues, valuesDiff);
         if (!request) {
           continue;
         }

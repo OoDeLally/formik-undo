@@ -120,6 +120,7 @@ export const FormikUndoContextProvider = <Values extends FormikValues>({
         return; // The state of the form has not changed. Nothing to do.
       }
       // console.log('SAVING', JSON.stringify((valuesToSave as any).content));
+      // console.log('SAVING',valuesToSave);
       checkpoints.push(valuesToSave);
       currentCheckpointIndexRef.current++;
     },

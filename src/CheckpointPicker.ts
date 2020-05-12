@@ -1,4 +1,5 @@
 import { FormikValues } from 'formik';
+import { FormikValuesDiff } from './getFormikValuesDiff';
 
 
 export type SaveRequest<T extends FormikValues> = {
@@ -12,9 +13,9 @@ export abstract class CheckpointPicker<T extends FormikValues> {
 
   abstract pick(
     previousValues: T,
-    previouslyModifiedFieldsKeys: (keyof T)[],
+    previousValuesDiff: FormikValuesDiff,
     newValues: T,
-    modifiedFieldsKeys: (keyof T)[],
+    valuesDiff: FormikValuesDiff,
   ): SaveRequest<T> | undefined;
 
 }

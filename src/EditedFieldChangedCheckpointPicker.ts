@@ -1,21 +1,6 @@
 import { CheckpointPicker, SaveRequest } from './CheckpointPicker';
 import { FormikValues } from 'formik';
-
-
-const areStringArrayElementsEqual = (arrayA: string[], arrayB: string[]) => {
-  // Ignore the order.
-  if (arrayA.length !== arrayB.length) {
-    return false;
-  }
-  const sortedArrayA = arrayA.sort();
-  const sortedArrayB = arrayB.sort();
-  for (const index in sortedArrayA) {
-    if (sortedArrayA[index] !== sortedArrayB[index]) {
-      return false;
-    }
-  }
-  return true;
-};
+import { FormikValuesDiff, fastArrayUniqueMerge } from './getFormikValuesDiff';
 
 
 /**
@@ -30,15 +15,18 @@ export class EditedFieldChangedCheckpointPicker<T extends FormikValues> extends 
 
   pick(
     previousValues: T,
-    previouslyModifiedFieldsKeys: (keyof T)[],
+    previousValuesDiff: FormikValuesDiff,
     newValues: T,
-    modifiedFieldsKeys: (keyof T)[],
+    valuesDiff: FormikValuesDiff,
   ): SaveRequest<T> | undefined {
 
-    const areModifiedFieldsDifferentFromLastTime = !areStringArrayElementsEqual(
-      modifiedFieldsKeys as string[],
-      previouslyModifiedFieldsKeys as string[],
-    );
+    const previouslyModifiedPaths = Object.keys(previousValuesDiff);
+    const newlyodifiedPaths = Object.keys(valuesDiff);
+
+    const allKeys = fastArrayUniqueMerge(previouslyModifiedPaths, newlyodifiedPaths);
+
+    const areModifiedFieldsDifferentFromLastTime = newlyodifiedPaths.length !== allKeys.length;
+
     if (areModifiedFieldsDifferentFromLastTime) {
       return { value: previousValues, now: true };
     }

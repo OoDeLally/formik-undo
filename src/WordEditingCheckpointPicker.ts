@@ -1,5 +1,6 @@
 import { CheckpointPicker, SaveRequest } from './CheckpointPicker';
 import { FormikValues } from 'formik';
+import { FormikValuesDiff } from './getFormikValuesDiff';
 
 
 const splitToWords = (str: string) => str.split(/\s+/g);
@@ -26,24 +27,28 @@ export class WordEditingCheckpointPicker<T extends FormikValues> extends Checkpo
 
   pick(
     previousValues: T,
-    previouslyModifiedFieldsKeys: (keyof T)[],
+    previousValuesDiff: FormikValuesDiff,
     newValues: T,
-    modifiedFieldsKeys: (keyof T)[],
+    valuesDiff: FormikValuesDiff,
   ): SaveRequest<T> | undefined {
 
 
     // console.log('modifiedFieldsKeys', modifiedFieldsKeys);
-    if (modifiedFieldsKeys.length !== 1) {
+    const modifiedPaths = Object.keys(valuesDiff);
+
+    if (modifiedPaths.length !== 1) {
       return; // Does not look like word editing. We should not prevent it.
     }
-    const modifiedFieldKey = modifiedFieldsKeys[0];
 
-    const previousValue = previousValues[modifiedFieldKey];
+    const modifiedPath = modifiedPaths[0];
+    const valueDiff = valuesDiff[modifiedPath]
+
+    const previousValue = valueDiff[0];
     if (typeof previousValue !== 'string') {
       return; // Does not look like word editing. We should not prevent it.
     }
 
-    const newValue = newValues[modifiedFieldKey];
+    const newValue = valueDiff[1];
     if (typeof newValue !== 'string') {
       return; // Does not look like word editing. We should not prevent it.
     }
