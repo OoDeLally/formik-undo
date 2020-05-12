@@ -8,9 +8,9 @@
     "dist"
   ],
   "browser": "dist/formik-undo.browser.js",
-  "types": "dist/formik-undo.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rollup -c && npm run bundle-types",
+    "build": "rollup -c",
     "bundle-types": "npm-dts --force -L info generate && mv index.d.ts dist/formik-undo.d.ts",
     "watch": "rollup -cw",
     "lint": "eslint src/**/*",
