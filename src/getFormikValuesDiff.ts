@@ -13,13 +13,19 @@ export type FormikValuesDiff = Record<string, [unknown, unknown]>;
  */
 
 
+ // Same as `typeof`, without the `null` bug.
+const getTypeOf = (val: unknown): string =>
+  val === null ? 'null' : typeof val;
+
+
 // Mutate the same output object to save time.
 const computeDiff = (a: unknown, b: unknown, output: FormikValuesDiff, path: string): void => {
   if (a === b) {
     return;
   }
-  const typeA = typeof a;
-  if (typeA !== typeof b) {
+  const typeA = getTypeOf(a);
+  const typeB = getTypeOf(b);
+  if (typeA !== typeB) {
     output[path] = [a, b];
     return;
   }
