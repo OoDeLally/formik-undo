@@ -11,6 +11,10 @@ interface ConstructorOptions {
   preventWordCutting: boolean;
 }
 
+function escapeRegExp(str: string) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 
 /**
  * This middleware prevents saving in the middle of editing a word.
@@ -60,7 +64,7 @@ export class WordEditingCheckpointPicker<T extends FormikValues> extends Checkpo
     // console.log('previousValue     ', JSON.stringify(previousValue));
     // console.log('newValue          ', JSON.stringify(newValue));
 
-    if ((new RegExp(`${previousValue}[\\s\\-]+`)).test(newValue)) {
+    if ((new RegExp(`${escapeRegExp(previousValue)}[\\s\\-]+`)).test(newValue)) {
       // User just added some space. Not worth saving, but we dont want FormikUndo to consider that this is a new state.
       // Therefore we state that the newValue is equivalent to the value we want to save.
       return { value: previousValues, equivalent: newValues };
